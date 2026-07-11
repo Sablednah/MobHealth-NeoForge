@@ -75,6 +75,10 @@ public final class MobHealthConfig {
     public static final ModConfigSpec.IntValue ENFORCE_BAR_WIDTH_VALUE;
     public static final ModConfigSpec.BooleanValue ENFORCE_BAR_HEIGHT;
     public static final ModConfigSpec.IntValue ENFORCE_BAR_HEIGHT_VALUE;
+    public static final ModConfigSpec.BooleanValue ENFORCE_SCALE;
+    public static final ModConfigSpec.DoubleValue ENFORCE_SCALE_VALUE;
+    public static final ModConfigSpec.EnumValue<Enforce> ENFORCE_SCALE_WITH_DISTANCE;
+    public static final ModConfigSpec.EnumValue<Enforce> ENFORCE_FADE_WITH_DISTANCE;
 
     static {
         BUILDER.comment("MobHealth — display modes. Enable any combination.").push("display");
@@ -162,6 +166,10 @@ public final class MobHealthConfig {
         ENFORCE_BAR_WIDTH_VALUE = BUILDER.comment("Forced bar width when enforceBarWidth = true.").defineInRange("barWidthValue", 40, 8, 200);
         ENFORCE_BAR_HEIGHT = BUILDER.comment("Force the graphical bar height (pixels).").define("enforceBarHeight", false);
         ENFORCE_BAR_HEIGHT_VALUE = BUILDER.comment("Forced bar height when enforceBarHeight = true.").defineInRange("barHeightValue", 4, 1, 24);
+        ENFORCE_SCALE = BUILDER.comment("Force the graphical bar scale multiplier.").define("enforceScale", false);
+        ENFORCE_SCALE_VALUE = BUILDER.comment("Forced scale when enforceScale = true.").defineInRange("scaleValue", 1.0D, 0.25D, 4.0D);
+        ENFORCE_SCALE_WITH_DISTANCE = BUILDER.comment("Shrink bars with distance (world-anchored feel).").defineEnum("scaleWithDistance", Enforce.CLIENT);
+        ENFORCE_FADE_WITH_DISTANCE = BUILDER.comment("Fade bars out near the max distance.").defineEnum("fadeWithDistance", Enforce.CLIENT);
         BUILDER.pop();
     }
 

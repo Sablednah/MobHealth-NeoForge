@@ -18,11 +18,14 @@ public record GraphicalPolicy(
         Double verticalOffset,
         Double maxDistance,
         Integer barWidth,
-        Integer barHeight) {
+        Integer barHeight,
+        Double scale,
+        Boolean scaleWithDistance,
+        Boolean fadeWithDistance) {
 
     /** No enforcement: allowed, and every option left to the client. Used on vanilla servers / logout. */
-    public static final GraphicalPolicy DEFAULT =
-            new GraphicalPolicy(true, null, null, null, null, null, null, null, null, null);
+    public static final GraphicalPolicy DEFAULT = new GraphicalPolicy(
+            true, null, null, null, null, null, null, null, null, null, null, null, null);
 
     // Resolve helpers: server override if present, otherwise the supplied client value.
     public boolean requireLineOfSight(boolean clientValue) {
@@ -59,5 +62,17 @@ public record GraphicalPolicy(
 
     public int barHeight(int clientValue) {
         return barHeight != null ? barHeight : clientValue;
+    }
+
+    public double scale(double clientValue) {
+        return scale != null ? scale : clientValue;
+    }
+
+    public boolean scaleWithDistance(boolean clientValue) {
+        return scaleWithDistance != null ? scaleWithDistance : clientValue;
+    }
+
+    public boolean fadeWithDistance(boolean clientValue) {
+        return fadeWithDistance != null ? fadeWithDistance : clientValue;
     }
 }

@@ -191,8 +191,11 @@ below); when it doesn't, these values apply.
 | `enabled` | `true` | bool | Master switch for graphical bars on your client. |
 | `verticalOffset` | `0.5` | `-2.0`–`6.0` | Extra height (blocks) above the mob's head. |
 | `maxDistance` | `24.0` | `4.0`–`96.0` | Only draw bars for mobs within this many blocks. |
-| `barWidth` | `40` | `8`–`200` | Bar width in pixels. |
-| `barHeight` | `4` | `1`–`24` | Bar height in pixels. |
+| `barWidth` | `40` | `8`–`200` | Bar width in pixels (at scale 1.0). |
+| `barHeight` | `4` | `1`–`24` | Bar height in pixels (at scale 1.0). |
+| `scale` | `1.0` | `0.25`–`4.0` | Overall size multiplier for the bar and its outline. |
+| `scaleWithDistance` | `false` | bool | Shrink bars as the mob gets further away, so they feel anchored in the world. |
+| `fadeWithDistance` | `false` | bool | Fade bars out as the mob approaches `maxDistance`. |
 | `showBackground` | `true` | bool | Draw a dark outline behind the bar. |
 | `showText` | `true` | bool | Draw the numeric health above the bar. |
 | `showPlayers` | `false` | bool | Also draw bars above other players. |
@@ -226,6 +229,9 @@ full control.
 | `enforceMaxDistance` / `maxDistanceValue` | `false` / `24.0` | bool / `4.0`–`96.0` | `maxDistance` |
 | `enforceBarWidth` / `barWidthValue` | `false` / `40` | bool / `8`–`200` | `barWidth` |
 | `enforceBarHeight` / `barHeightValue` | `false` / `4` | bool / `1`–`24` | `barHeight` |
+| `enforceScale` / `scaleValue` | `false` / `1.0` | bool / `0.25`–`4.0` | `scale` |
+| `scaleWithDistance` | `CLIENT` | `CLIENT`/`ON`/`OFF` | `scaleWithDistance` |
+| `fadeWithDistance` | `CLIENT` | `CLIENT`/`ON`/`OFF` | `fadeWithDistance` |
 
 > To disable graphical bars entirely from the server, set `[display] graphical = false` — that turns
 > them off for all modded clients.
@@ -305,6 +311,17 @@ graphical bars:
     filledChar = "|"
     emptyChar = " "
     valueStyle = "PERCENT"
+```
+
+**Big, world-anchored graphical bars** — larger bars that shrink and fade with distance (set these
+in `mobhealth-client.toml`, or enforce them server-side in `[graphicalEnforce]`):
+
+```toml
+[graphical]
+    scale = 1.75
+    scaleWithDistance = true
+    fadeWithDistance = true
+    maxDistance = 32.0
 ```
 
 **Immersive graphical-only** — no text clutter, bars only for hurt, visible mobs:

@@ -33,13 +33,17 @@ public record GraphicalGatePayload(GraphicalPolicy policy) implements CustomPack
         writeOptDouble(buf, p.maxDistance());
         writeOptInt(buf, p.barWidth());
         writeOptInt(buf, p.barHeight());
+        writeOptDouble(buf, p.scale());
+        writeOptBool(buf, p.scaleWithDistance());
+        writeOptBool(buf, p.fadeWithDistance());
     }
 
     private static GraphicalGatePayload decode(RegistryFriendlyByteBuf buf) {
         return new GraphicalGatePayload(new GraphicalPolicy(
                 buf.readBoolean(),
                 readOptBool(buf), readOptBool(buf), readOptBool(buf), readOptBool(buf), readOptBool(buf),
-                readOptDouble(buf), readOptDouble(buf), readOptInt(buf), readOptInt(buf)));
+                readOptDouble(buf), readOptDouble(buf), readOptInt(buf), readOptInt(buf),
+                readOptDouble(buf), readOptBool(buf), readOptBool(buf)));
     }
 
     private static void writeOptBool(RegistryFriendlyByteBuf buf, Boolean value) {

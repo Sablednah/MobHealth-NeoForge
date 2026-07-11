@@ -80,7 +80,10 @@ public final class MobHealthPermissions {
                 MobHealthConfig.ENFORCE_OFFSET.get() ? MobHealthConfig.ENFORCE_OFFSET_VALUE.get() : null,
                 MobHealthConfig.ENFORCE_MAX_DISTANCE.get() ? MobHealthConfig.ENFORCE_MAX_DISTANCE_VALUE.get() : null,
                 MobHealthConfig.ENFORCE_BAR_WIDTH.get() ? MobHealthConfig.ENFORCE_BAR_WIDTH_VALUE.get() : null,
-                MobHealthConfig.ENFORCE_BAR_HEIGHT.get() ? MobHealthConfig.ENFORCE_BAR_HEIGHT_VALUE.get() : null);
+                MobHealthConfig.ENFORCE_BAR_HEIGHT.get() ? MobHealthConfig.ENFORCE_BAR_HEIGHT_VALUE.get() : null,
+                MobHealthConfig.ENFORCE_SCALE.get() ? MobHealthConfig.ENFORCE_SCALE_VALUE.get() : null,
+                MobHealthConfig.ENFORCE_SCALE_WITH_DISTANCE.get().asOverride(),
+                MobHealthConfig.ENFORCE_FADE_WITH_DISTANCE.get().asOverride());
     }
 
     private static CompoundTag persisted(ServerPlayer player) {

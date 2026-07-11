@@ -16,6 +16,9 @@ public final class MobHealthClientConfig {
     public static final ModConfigSpec.DoubleValue MAX_DISTANCE;
     public static final ModConfigSpec.IntValue BAR_WIDTH;
     public static final ModConfigSpec.IntValue BAR_HEIGHT;
+    public static final ModConfigSpec.DoubleValue SCALE;
+    public static final ModConfigSpec.BooleanValue SCALE_WITH_DISTANCE;
+    public static final ModConfigSpec.BooleanValue FADE_WITH_DISTANCE;
     public static final ModConfigSpec.BooleanValue SHOW_BACKGROUND;
     public static final ModConfigSpec.BooleanValue SHOW_TEXT;
     public static final ModConfigSpec.BooleanValue SHOW_PLAYERS;
@@ -31,8 +34,14 @@ public final class MobHealthClientConfig {
         MAX_DISTANCE = BUILDER
                 .comment("Only draw bars for mobs within this many blocks of you.")
                 .defineInRange("maxDistance", 24.0D, 4.0D, 96.0D);
-        BAR_WIDTH = BUILDER.comment("Bar width in pixels (at the screen).").defineInRange("barWidth", 40, 8, 200);
-        BAR_HEIGHT = BUILDER.comment("Bar height in pixels.").defineInRange("barHeight", 4, 1, 24);
+        BAR_WIDTH = BUILDER.comment("Bar width in pixels (at scale 1.0).").defineInRange("barWidth", 40, 8, 200);
+        BAR_HEIGHT = BUILDER.comment("Bar height in pixels (at scale 1.0).").defineInRange("barHeight", 4, 1, 24);
+        SCALE = BUILDER.comment("Overall size multiplier for the bar (and its outline). 1.0 = the width/height above.")
+                .defineInRange("scale", 1.0D, 0.25D, 4.0D);
+        SCALE_WITH_DISTANCE = BUILDER.comment("Shrink bars as the mob gets further away, so they feel anchored in the world.")
+                .define("scaleWithDistance", false);
+        FADE_WITH_DISTANCE = BUILDER.comment("Fade bars out as the mob approaches maxDistance.")
+                .define("fadeWithDistance", false);
         SHOW_BACKGROUND = BUILDER.comment("Draw a dark outline/background behind the bar.").define("showBackground", true);
         SHOW_TEXT = BUILDER.comment("Draw the numeric health above the bar.").define("showText", true);
         SHOW_PLAYERS = BUILDER.comment("Also draw bars above other players.").define("showPlayers", false);

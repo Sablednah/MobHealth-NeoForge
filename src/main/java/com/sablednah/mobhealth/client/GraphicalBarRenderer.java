@@ -79,6 +79,11 @@ public final class GraphicalBarRenderer {
         boolean showPlayers = policy.showPlayers(MobHealthClientConfig.SHOW_PLAYERS.get());
         boolean onlyDamaged = policy.onlyWhenDamaged(MobHealthClientConfig.ONLY_WHEN_DAMAGED.get());
         boolean requireLos = policy.requireLineOfSight(MobHealthClientConfig.REQUIRE_LINE_OF_SIGHT.get());
+        double scale = policy.scale(MobHealthClientConfig.SCALE.get());
+        boolean scaleWithDistance = policy.scaleWithDistance(MobHealthClientConfig.SCALE_WITH_DISTANCE.get());
+        boolean fadeWithDistance = policy.fadeWithDistance(MobHealthClientConfig.FADE_WITH_DISTANCE.get());
+        int baseWidth = policy.barWidth(MobHealthClientConfig.BAR_WIDTH.get());
+        int baseHeight = policy.barHeight(MobHealthClientConfig.BAR_HEIGHT.get());
 
         for (Entity entity : mc.level.entitiesForRendering()) {
             if (!(entity instanceof LivingEntity living) || !living.isAlive() || living == mc.player) {
@@ -104,7 +109,8 @@ public final class GraphicalBarRenderer {
             double dx = pos.x - camPos.x;
             double dy = barY - camPos.y;
             double dz = pos.z - camPos.z;
-            if (dx * dx + dy * dy + dz * dz > maxDistSq) {
+            double distSq = dx * dx + dy * dy + dz * dz;
+            if (distSq > maxDistSq) {
                 continue;
             }
 
@@ -127,33 +133,52 @@ public final class GraphicalBarRenderer {
                 }
             }
 
+            // Size: base * scale, optionally shrinking with distance (1.0 up close -> ~0.4 at maxDist).
+            double dist = Math.sqrt(distSq);
+            float sizeMul = (float) scale;
+            if (scaleWithDistance) {
+                sizeMul *= (float) (1.0 - 0.6 * Math.min(dist / maxDist, 1.0));
+            }
+            int width = Math.max(1, Math.round(baseWidth * sizeMul));
+            int height = Math.max(1, Math.round(baseHeight * sizeMul));
+
+            // Fade: fully opaque until 70% of maxDist, then fade to 0 at the edge.
+            float alpha = 1.0F;
+            if (fadeWithDistance) {
+                double fadeStart = maxDist * 0.7;
+                alpha = (float) clamp01((maxDist - dist) / Math.max(1.0, maxDist - fadeStart));
+            }
+            if (alpha <= 0.02F) {
+                continue;
+            }
+
             int sx = Math.round((ndcX * 0.5F + 0.5F) * screenW);
             int sy = Math.round((1.0F - (ndcY * 0.5F + 0.5F)) * screenH);
-            drawBar(graphics, mc, sx, sy, health, max);
+            drawBar(graphics, mc, sx, sy, health, max, width, height,
+                    policy.showBackground(MobHealthClientConfig.SHOW_BACKGROUND.get()),
+                    policy.showText(MobHealthClientConfig.SHOW_TEXT.get()), alpha);
         }
     }
 
-    private static void drawBar(GuiGraphics graphics, Minecraft mc, int cx, int cy, float health, float max) {
-        GraphicalPolicy policy = GraphicalGateState.policy;
-        int width = policy.barWidth(MobHealthClientConfig.BAR_WIDTH.get());
-        int height = policy.barHeight(MobHealthClientConfig.BAR_HEIGHT.get());
+    private static void drawBar(GuiGraphics graphics, Minecraft mc, int cx, int cy, float health, float max,
+                                int width, int height, boolean showBackground, boolean showText, float alpha) {
         int left = cx - width / 2;
         int top = cy - height / 2;
         float fraction = Math.max(0.0F, Math.min(health / max, 1.0F));
 
-        if (policy.showBackground(MobHealthClientConfig.SHOW_BACKGROUND.get())) {
-            graphics.fill(left - 1, top - 1, left + width + 1, top + height + 1, 0xC0000000);
+        if (showBackground) {
+            graphics.fill(left - 1, top - 1, left + width + 1, top + height + 1, withAlpha(0xC0000000, alpha));
         }
-        graphics.fill(left, top, left + width, top + height, 0xFF3A3A3A);
+        graphics.fill(left, top, left + width, top + height, withAlpha(0xFF3A3A3A, alpha));
         int filledWidth = Math.round(width * fraction);
         if (filledWidth > 0) {
-            graphics.fill(left, top, left + filledWidth, top + height, colorFor(fraction));
+            graphics.fill(left, top, left + filledWidth, top + height, withAlpha(colorFor(fraction), alpha));
         }
 
-        if (policy.showText(MobHealthClientConfig.SHOW_TEXT.get())) {
+        if (showText) {
             String text = HealthBarFormatter.value(health, max, ValueStyle.CURRENT_MAX);
             int textX = cx - mc.font.width(text) / 2;
-            graphics.drawString(mc.font, text, textX, top - 10, 0xFFFFFFFF);
+            graphics.drawString(mc.font, text, textX, top - 10, withAlpha(0xFFFFFFFF, alpha));
         }
     }
 
@@ -165,5 +190,15 @@ public final class GraphicalBarRenderer {
             return 0xFFFFD633; // yellow
         }
         return 0xFFFF4444; // red
+    }
+
+    /** Scale an ARGB colour's alpha channel by {@code factor} (0..1). */
+    private static int withAlpha(int argb, float factor) {
+        int a = Math.round(((argb >>> 24) & 0xFF) * Math.max(0.0F, Math.min(factor, 1.0F)));
+        return (a << 24) | (argb & 0x00FFFFFF);
+    }
+
+    private static double clamp01(double v) {
+        return v < 0.0 ? 0.0 : Math.min(v, 1.0);
     }
 }
