@@ -1,0 +1,33 @@
+# MobHealth — neoforge.mods.toml (values are expanded from gradle.properties at build time).
+modLoader="javafml"
+loaderVersion="${loader_version_range}"
+license="${mod_license}"
+issueTrackerURL="https://github.com/Sablednah/MobHealth-NeoForge/issues"
+
+[[mods]]
+modId="${mod_id}"
+version="${mod_version}"
+displayName="${mod_name}"
+authors="${mod_authors}"
+description='''
+${mod_description}
+'''
+displayURL="https://github.com/Sablednah/MobHealth-NeoForge"
+#logoFile="mobhealth.png"
+
+# Client rendering is done via a client-only entrypoint; the mod also works fully
+# server-side (nameplate bars, boss bars, chat) with vanilla clients.
+
+[[dependencies.${mod_id}]]
+    modId="neoforge"
+    type="required"
+    versionRange="[${neo_version},)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="minecraft"
+    type="required"
+    versionRange="${minecraft_version_range}"
+    ordering="NONE"
+    side="BOTH"
