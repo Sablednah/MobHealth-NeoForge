@@ -1,7 +1,70 @@
 {
-  "mobhealth.configuration.title": "MobHealth Configuration",
+  "mobhealth.configuration.title": "MobHealth",
+
   "mobhealth.configuration.display": "Display Modes",
   "mobhealth.configuration.targets": "Target Entities",
-  "mobhealth.configuration.bar": "Bar Appearance",
-  "mobhealth.configuration.timing": "Timing"
+  "mobhealth.configuration.bar": "Text Bar Appearance",
+  "mobhealth.configuration.bossbar": "Boss Bar",
+  "mobhealth.configuration.nameplate": "Nameplate",
+  "mobhealth.configuration.timing": "Timing",
+  "mobhealth.configuration.graphicalEnforce": "Graphical Bars — Server Enforcement",
+  "mobhealth.configuration.graphical": "Graphical Bars",
+
+  "mobhealth.configuration.chat": "Chat Messages",
+  "mobhealth.configuration.bossBar": "Boss Bar",
+  "mobhealth.configuration.audience": "Audience",
+  "mobhealth.configuration.nearbyRadius": "Nearby Radius (blocks)",
+  "mobhealth.configuration.chatContent": "Chat Content",
+
+  "mobhealth.configuration.hostile": "Hostile Mobs",
+  "mobhealth.configuration.neutral": "Neutral Mobs",
+  "mobhealth.configuration.passive": "Passive Mobs",
+  "mobhealth.configuration.players": "Players (PvP)",
+  "mobhealth.configuration.bosses": "Bosses",
+  "mobhealth.configuration.hideUntilDamaged": "Hide Until Damaged",
+  "mobhealth.configuration.overrides": "Per-Entity Overrides",
+
+  "mobhealth.configuration.segments": "Bar Segments",
+  "mobhealth.configuration.filledChar": "Filled Glyph",
+  "mobhealth.configuration.emptyChar": "Depleted Glyph",
+  "mobhealth.configuration.valueStyle": "Number Style",
+
+  "mobhealth.configuration.color": "Boss Bar Colour",
+
+  "mobhealth.configuration.mode": "Nameplate Mode",
+  "mobhealth.configuration.content": "Nameplate Content",
+
+  "mobhealth.configuration.displayTicks": "Display Duration (ticks)",
+  "mobhealth.configuration.displayTicksHostile": "Duration — Hostile (ticks)",
+  "mobhealth.configuration.displayTicksNeutral": "Duration — Neutral (ticks)",
+  "mobhealth.configuration.displayTicksPassive": "Duration — Passive (ticks)",
+  "mobhealth.configuration.deathTicks": "Linger After Death (ticks)",
+
+  "mobhealth.configuration.lineOfSight": "Enforce Line of Sight",
+  "mobhealth.configuration.numbers": "Enforce Numbers",
+  "mobhealth.configuration.background": "Enforce Background",
+  "mobhealth.configuration.enforceVerticalOffset": "Enforce Vertical Offset",
+  "mobhealth.configuration.verticalOffsetValue": "Vertical Offset Value (blocks)",
+  "mobhealth.configuration.enforceMaxDistance": "Enforce Max Distance",
+  "mobhealth.configuration.maxDistanceValue": "Max Distance Value (blocks)",
+  "mobhealth.configuration.enforceBarWidth": "Enforce Bar Width",
+  "mobhealth.configuration.barWidthValue": "Bar Width Value (px)",
+  "mobhealth.configuration.enforceBarHeight": "Enforce Bar Height",
+  "mobhealth.configuration.barHeightValue": "Bar Height Value (px)",
+  "mobhealth.configuration.enforceScale": "Enforce Scale",
+  "mobhealth.configuration.scaleValue": "Scale Value",
+
+  "mobhealth.configuration.enabled": "Enabled",
+  "mobhealth.configuration.verticalOffset": "Vertical Offset (blocks)",
+  "mobhealth.configuration.maxDistance": "Max Distance (blocks)",
+  "mobhealth.configuration.barWidth": "Bar Width (px)",
+  "mobhealth.configuration.barHeight": "Bar Height (px)",
+  "mobhealth.configuration.scale": "Scale",
+  "mobhealth.configuration.scaleWithDistance": "Scale With Distance",
+  "mobhealth.configuration.fadeWithDistance": "Fade With Distance",
+  "mobhealth.configuration.showBackground": "Background",
+  "mobhealth.configuration.showText": "Show Numbers",
+  "mobhealth.configuration.showPlayers": "Show Above Players",
+  "mobhealth.configuration.onlyWhenDamaged": "Only When Damaged",
+  "mobhealth.configuration.requireLineOfSight": "Require Line of Sight"
 }

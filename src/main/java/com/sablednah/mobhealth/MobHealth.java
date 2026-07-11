@@ -8,11 +8,14 @@ import com.sablednah.mobhealth.neoforge.DisplayManager;
 import com.sablednah.mobhealth.neoforge.MobHealthServerEvents;
 import com.sablednah.mobhealth.network.MobHealthNetwork;
 
+import net.minecraft.server.MinecraftServer;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 /**
  * MobHealth — main mod entrypoint (common: loaded on both client and dedicated server).
@@ -53,6 +56,20 @@ public class MobHealth {
         // Register network payloads (mod event bus) for the server-enforced graphical gate.
         modEventBus.addListener(MobHealthNetwork::register);
 
+        // When the common config is edited (file or in-game screen), re-push the graphical policy
+        // to every online player so enforcement changes apply without a manual /mobhealth reload.
+        modEventBus.addListener(this::onConfigReloading);
+
         LOGGER.info("MobHealth {} initialising", modContainer.getModInfo().getVersion());
+    }
+
+    private void onConfigReloading(ModConfigEvent.Reloading event) {
+        if (event.getConfig().getSpec() != MobHealthConfig.SPEC) {
+            return;
+        }
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        if (server != null) {
+            server.execute(() -> server.getPlayerList().getPlayers().forEach(MobHealthNetwork::sync));
+        }
     }
 }

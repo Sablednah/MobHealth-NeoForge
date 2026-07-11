@@ -71,7 +71,7 @@ MobHealth works as a **server-only**, **client-only**, or **both-sides** install
 
 | Command | Who can use it | Description |
 |---------|----------------|-------------|
-| `/mobhealth reload` | Ops (permission level 2+) | Re-syncs settings to online players. (Config also applies automatically when you save the file.) |
+| `/mobhealth reload` | Ops (permission level 2+) | Re-pushes settings (including graphical enforcement) to online players. Config edits also auto-apply when the file is saved, so this is rarely needed. |
 | `/mobhealth toggle` | Everyone | Toggles **your own** displays on/off. Your choice is saved and persists across logouts and deaths. |
 | `/mobhealth toggle on` | Everyone | Turns your displays on. |
 | `/mobhealth toggle off` | Everyone | Turns your displays off (hides chat, boss bar, and graphical bars for you). |
