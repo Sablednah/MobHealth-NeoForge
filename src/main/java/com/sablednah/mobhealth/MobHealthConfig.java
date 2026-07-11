@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.sablednah.mobhealth.core.Audience;
 import com.sablednah.mobhealth.core.BarContent;
+import com.sablednah.mobhealth.core.Enforce;
 import com.sablednah.mobhealth.core.MobCategory;
 import com.sablednah.mobhealth.core.NameplateMode;
 import com.sablednah.mobhealth.core.HealthBarFormatter.ValueStyle;
@@ -59,6 +60,21 @@ public final class MobHealthConfig {
     public static final ModConfigSpec.IntValue DISPLAY_TICKS_NEUTRAL;
     public static final ModConfigSpec.IntValue DISPLAY_TICKS_PASSIVE;
     public static final ModConfigSpec.IntValue DEATH_TICKS;
+
+    // ---------------------------------- graphical enforcement (server overrides modded clients)
+    public static final ModConfigSpec.EnumValue<Enforce> ENFORCE_LINE_OF_SIGHT;
+    public static final ModConfigSpec.EnumValue<Enforce> ENFORCE_NUMBERS;
+    public static final ModConfigSpec.EnumValue<Enforce> ENFORCE_BACKGROUND;
+    public static final ModConfigSpec.EnumValue<Enforce> ENFORCE_SHOW_PLAYERS;
+    public static final ModConfigSpec.EnumValue<Enforce> ENFORCE_ONLY_WHEN_DAMAGED;
+    public static final ModConfigSpec.BooleanValue ENFORCE_OFFSET;
+    public static final ModConfigSpec.DoubleValue ENFORCE_OFFSET_VALUE;
+    public static final ModConfigSpec.BooleanValue ENFORCE_MAX_DISTANCE;
+    public static final ModConfigSpec.DoubleValue ENFORCE_MAX_DISTANCE_VALUE;
+    public static final ModConfigSpec.BooleanValue ENFORCE_BAR_WIDTH;
+    public static final ModConfigSpec.IntValue ENFORCE_BAR_WIDTH_VALUE;
+    public static final ModConfigSpec.BooleanValue ENFORCE_BAR_HEIGHT;
+    public static final ModConfigSpec.IntValue ENFORCE_BAR_HEIGHT_VALUE;
 
     static {
         BUILDER.comment("MobHealth — display modes. Enable any combination.").push("display");
@@ -125,6 +141,27 @@ public final class MobHealthConfig {
                 .comment("How long a boss bar / nameplate lingers after the mob DIES (0 = remove next tick).",
                         "Kept short so an empty boss bar doesn't hang around after a kill.")
                 .defineInRange("deathTicks", 20, 0, 600);
+        BUILDER.pop();
+
+        BUILDER.comment("Server enforcement of the CLIENT-side graphical bar options.",
+                "These let the server override what modded clients draw. Boolean options use:",
+                "  CLIENT = let each client decide (their client config wins)",
+                "  ON     = force the option on for everyone",
+                "  OFF    = force the option off for everyone",
+                "Numeric options: set enforce<X> = true to force <x>Value on all clients.").push("graphicalEnforce");
+        ENFORCE_LINE_OF_SIGHT = BUILDER.comment("Only draw bars for mobs the player can see.").defineEnum("lineOfSight", Enforce.CLIENT);
+        ENFORCE_NUMBERS = BUILDER.comment("Show the numeric health above graphical bars.").defineEnum("numbers", Enforce.CLIENT);
+        ENFORCE_BACKGROUND = BUILDER.comment("Dark outline/background behind graphical bars.").defineEnum("background", Enforce.CLIENT);
+        ENFORCE_SHOW_PLAYERS = BUILDER.comment("Draw graphical bars above other players.").defineEnum("showPlayers", Enforce.CLIENT);
+        ENFORCE_ONLY_WHEN_DAMAGED = BUILDER.comment("Only draw a graphical bar once the mob is hurt.").defineEnum("onlyWhenDamaged", Enforce.CLIENT);
+        ENFORCE_OFFSET = BUILDER.comment("Force the graphical bar's vertical offset (blocks above head).").define("enforceVerticalOffset", false);
+        ENFORCE_OFFSET_VALUE = BUILDER.comment("Forced vertical offset when enforceVerticalOffset = true.").defineInRange("verticalOffsetValue", 0.5D, -2.0D, 6.0D);
+        ENFORCE_MAX_DISTANCE = BUILDER.comment("Force the graphical bar draw distance (blocks).").define("enforceMaxDistance", false);
+        ENFORCE_MAX_DISTANCE_VALUE = BUILDER.comment("Forced max distance when enforceMaxDistance = true.").defineInRange("maxDistanceValue", 24.0D, 4.0D, 96.0D);
+        ENFORCE_BAR_WIDTH = BUILDER.comment("Force the graphical bar width (pixels).").define("enforceBarWidth", false);
+        ENFORCE_BAR_WIDTH_VALUE = BUILDER.comment("Forced bar width when enforceBarWidth = true.").defineInRange("barWidthValue", 40, 8, 200);
+        ENFORCE_BAR_HEIGHT = BUILDER.comment("Force the graphical bar height (pixels).").define("enforceBarHeight", false);
+        ENFORCE_BAR_HEIGHT_VALUE = BUILDER.comment("Forced bar height when enforceBarHeight = true.").defineInRange("barHeightValue", 4, 1, 24);
         BUILDER.pop();
     }
 

@@ -2,6 +2,7 @@ package com.sablednah.mobhealth.neoforge;
 
 import com.sablednah.mobhealth.MobHealth;
 import com.sablednah.mobhealth.MobHealthConfig;
+import com.sablednah.mobhealth.network.GraphicalPolicy;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
@@ -65,6 +66,21 @@ public final class MobHealthPermissions {
      */
     public static boolean graphicalAllowedFor(ServerPlayer player) {
         return MobHealthConfig.GRAPHICAL_ALLOWED.get() && receivesDisplays(player);
+    }
+
+    /** Build the full graphical policy sent to a client: gate + server-enforced option overrides. */
+    public static GraphicalPolicy graphicalPolicyFor(ServerPlayer player) {
+        return new GraphicalPolicy(
+                graphicalAllowedFor(player),
+                MobHealthConfig.ENFORCE_LINE_OF_SIGHT.get().asOverride(),
+                MobHealthConfig.ENFORCE_NUMBERS.get().asOverride(),
+                MobHealthConfig.ENFORCE_BACKGROUND.get().asOverride(),
+                MobHealthConfig.ENFORCE_SHOW_PLAYERS.get().asOverride(),
+                MobHealthConfig.ENFORCE_ONLY_WHEN_DAMAGED.get().asOverride(),
+                MobHealthConfig.ENFORCE_OFFSET.get() ? MobHealthConfig.ENFORCE_OFFSET_VALUE.get() : null,
+                MobHealthConfig.ENFORCE_MAX_DISTANCE.get() ? MobHealthConfig.ENFORCE_MAX_DISTANCE_VALUE.get() : null,
+                MobHealthConfig.ENFORCE_BAR_WIDTH.get() ? MobHealthConfig.ENFORCE_BAR_WIDTH_VALUE.get() : null,
+                MobHealthConfig.ENFORCE_BAR_HEIGHT.get() ? MobHealthConfig.ENFORCE_BAR_HEIGHT_VALUE.get() : null);
     }
 
     private static CompoundTag persisted(ServerPlayer player) {

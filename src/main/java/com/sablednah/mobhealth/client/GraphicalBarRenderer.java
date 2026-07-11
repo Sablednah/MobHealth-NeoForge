@@ -7,6 +7,7 @@ import org.joml.Vector4f;
 import com.sablednah.mobhealth.core.HealthBarFormatter;
 import com.sablednah.mobhealth.core.HealthBarFormatter.ValueStyle;
 import com.sablednah.mobhealth.network.GraphicalGateState;
+import com.sablednah.mobhealth.network.GraphicalPolicy;
 
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
@@ -37,16 +38,17 @@ public final class GraphicalBarRenderer {
 
     private GraphicalBarRenderer() {}
 
-    /** Reset the gate when leaving a server, so a server that disabled it doesn't affect the next one. */
+    /** Reset the policy when leaving a server, so a server's overrides don't affect the next one. */
     @SubscribeEvent
     public static void onLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
-        GraphicalGateState.serverAllowsGraphical = true;
+        GraphicalGateState.policy = GraphicalPolicy.DEFAULT;
     }
 
     @SubscribeEvent
     public static void onRenderGui(RenderGuiEvent.Post event) {
-        // Client toggle AND server-enforced gate (server's graphical config + this player's see/mute).
-        if (!MobHealthClientConfig.ENABLED.get() || !GraphicalGateState.serverAllowsGraphical) {
+        GraphicalPolicy policy = GraphicalGateState.policy;
+        // Client toggle AND server gate (server's graphical config + this player's see/mute).
+        if (!MobHealthClientConfig.ENABLED.get() || !policy.allowed()) {
             return;
         }
         Minecraft mc = Minecraft.getInstance();
@@ -70,12 +72,13 @@ public final class GraphicalBarRenderer {
         int screenW = graphics.guiWidth();
         int screenH = graphics.guiHeight();
 
-        double offset = MobHealthClientConfig.VERTICAL_OFFSET.get();
-        double maxDist = MobHealthClientConfig.MAX_DISTANCE.get();
+        // Each option: the server's enforced value if it set one, otherwise this client's config.
+        double offset = policy.verticalOffset(MobHealthClientConfig.VERTICAL_OFFSET.get());
+        double maxDist = policy.maxDistance(MobHealthClientConfig.MAX_DISTANCE.get());
         double maxDistSq = maxDist * maxDist;
-        boolean showPlayers = MobHealthClientConfig.SHOW_PLAYERS.get();
-        boolean onlyDamaged = MobHealthClientConfig.ONLY_WHEN_DAMAGED.get();
-        boolean requireLos = MobHealthClientConfig.REQUIRE_LINE_OF_SIGHT.get();
+        boolean showPlayers = policy.showPlayers(MobHealthClientConfig.SHOW_PLAYERS.get());
+        boolean onlyDamaged = policy.onlyWhenDamaged(MobHealthClientConfig.ONLY_WHEN_DAMAGED.get());
+        boolean requireLos = policy.requireLineOfSight(MobHealthClientConfig.REQUIRE_LINE_OF_SIGHT.get());
 
         for (Entity entity : mc.level.entitiesForRendering()) {
             if (!(entity instanceof LivingEntity living) || !living.isAlive() || living == mc.player) {
@@ -131,13 +134,14 @@ public final class GraphicalBarRenderer {
     }
 
     private static void drawBar(GuiGraphics graphics, Minecraft mc, int cx, int cy, float health, float max) {
-        int width = MobHealthClientConfig.BAR_WIDTH.get();
-        int height = MobHealthClientConfig.BAR_HEIGHT.get();
+        GraphicalPolicy policy = GraphicalGateState.policy;
+        int width = policy.barWidth(MobHealthClientConfig.BAR_WIDTH.get());
+        int height = policy.barHeight(MobHealthClientConfig.BAR_HEIGHT.get());
         int left = cx - width / 2;
         int top = cy - height / 2;
         float fraction = Math.max(0.0F, Math.min(health / max, 1.0F));
 
-        if (MobHealthClientConfig.SHOW_BACKGROUND.get()) {
+        if (policy.showBackground(MobHealthClientConfig.SHOW_BACKGROUND.get())) {
             graphics.fill(left - 1, top - 1, left + width + 1, top + height + 1, 0xC0000000);
         }
         graphics.fill(left, top, left + width, top + height, 0xFF3A3A3A);
@@ -146,7 +150,7 @@ public final class GraphicalBarRenderer {
             graphics.fill(left, top, left + filledWidth, top + height, colorFor(fraction));
         }
 
-        if (MobHealthClientConfig.SHOW_TEXT.get()) {
+        if (policy.showText(MobHealthClientConfig.SHOW_TEXT.get())) {
             String text = HealthBarFormatter.value(health, max, ValueStyle.CURRENT_MAX);
             int textX = cx - mc.font.width(text) / 2;
             graphics.drawString(mc.font, text, textX, top - 10, 0xFFFFFFFF);

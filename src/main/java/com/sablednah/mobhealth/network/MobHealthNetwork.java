@@ -26,11 +26,11 @@ public final class MobHealthNetwork {
      * during registration on a dedicated server is safe.
      */
     private static void handleOnClient(GraphicalGatePayload payload, IPayloadContext context) {
-        context.enqueueWork(() -> GraphicalGateState.serverAllowsGraphical = payload.allowed());
+        context.enqueueWork(() -> GraphicalGateState.policy = payload.policy());
     }
 
-    /** Send the player their current effective graphical-bar permission. */
+    /** Send the player their current graphical-bar policy (gate + server-enforced overrides). */
     public static void sync(ServerPlayer player) {
-        PacketDistributor.sendToPlayer(player, new GraphicalGatePayload(MobHealthPermissions.graphicalAllowedFor(player)));
+        PacketDistributor.sendToPlayer(player, new GraphicalGatePayload(MobHealthPermissions.graphicalPolicyFor(player)));
     }
 }
