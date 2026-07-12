@@ -36,6 +36,7 @@
 
   "mobhealth.configuration.mode": "Nameplate Mode",
   "mobhealth.configuration.content": "Nameplate Content",
+  "mobhealth.configuration.projectileIcon": "Projectile Icon",
 
   "mobhealth.configuration.displayTicks": "Display Duration (ticks)",
   "mobhealth.configuration.displayTicksHostile": "Duration — Hostile (ticks)",

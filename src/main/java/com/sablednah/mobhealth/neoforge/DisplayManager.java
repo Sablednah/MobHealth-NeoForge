@@ -13,6 +13,7 @@ import com.sablednah.mobhealth.network.ToastPayload;
 import com.sablednah.mobhealth.core.Audience;
 import com.sablednah.mobhealth.core.MobCategory;
 import com.sablednah.mobhealth.core.NameplateMode;
+import com.sablednah.mobhealth.core.ProjectileIcon;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -24,9 +25,9 @@ import net.minecraft.world.BossEvent;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
@@ -190,14 +191,33 @@ public final class DisplayManager {
         }
     }
 
-    /** The item that dealt the damage: an arrow for projectiles, else the weapon / main-hand item. */
+    /**
+     * The item that dealt the damage, for the toast icon. Melee shows the weapon (main-hand). Ranged
+     * shows the projectile (arrow/trident) or, per config, the firing weapon (bow/crossbow). Degrades
+     * gracefully so modded projectiles (gun mods, ...) still show something: preferred -> the other
+     * -> held item -> empty (client draws the heart).
+     */
     private static ItemStack damageIcon(DamageSource source, ServerPlayer attacker) {
-        if (source.getDirectEntity() instanceof AbstractArrow) {
-            return new ItemStack(Items.ARROW);
+        Entity direct = source.getDirectEntity();
+        ItemStack firingWeapon = source.getWeaponItem(); // bow/crossbow/gun for projectiles, weapon for melee
+
+        if (direct instanceof Projectile) {
+            ItemStack projectileItem = direct instanceof AbstractArrow arrow
+                    ? arrow.getPickupItemStackOrigin() : ItemStack.EMPTY;
+            boolean preferWeapon = MobHealthConfig.TOAST_PROJECTILE_ICON.get() == ProjectileIcon.WEAPON;
+            ItemStack first = preferWeapon ? firingWeapon : projectileItem;
+            ItemStack second = preferWeapon ? projectileItem : firingWeapon;
+            if (first != null && !first.isEmpty()) {
+                return first;
+            }
+            if (second != null && !second.isEmpty()) {
+                return second;
+            }
+            return attacker.getMainHandItem();
         }
-        ItemStack weapon = source.getWeaponItem();
-        if (weapon != null && !weapon.isEmpty()) {
-            return weapon;
+
+        if (firingWeapon != null && !firingWeapon.isEmpty()) {
+            return firingWeapon;
         }
         return attacker.getMainHandItem(); // may be empty -> client shows the heart fallback
     }

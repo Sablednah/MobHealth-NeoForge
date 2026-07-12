@@ -11,6 +11,7 @@ import com.sablednah.mobhealth.core.BarStyle;
 import com.sablednah.mobhealth.core.Enforce;
 import com.sablednah.mobhealth.core.MobCategory;
 import com.sablednah.mobhealth.core.NameplateMode;
+import com.sablednah.mobhealth.core.ProjectileIcon;
 import com.sablednah.mobhealth.core.HealthBarFormatter.ValueStyle;
 
 import net.neoforged.neoforge.common.ModConfigSpec;
@@ -56,6 +57,7 @@ public final class MobHealthConfig {
     public static final ModConfigSpec.ConfigValue<String> BOSS_BAR_COLOR;
     public static final ModConfigSpec.EnumValue<NameplateMode> NAMEPLATE_MODE;
     public static final ModConfigSpec.EnumValue<BarContent> NAMEPLATE_CONTENT;
+    public static final ModConfigSpec.EnumValue<ProjectileIcon> TOAST_PROJECTILE_ICON;
     public static final ModConfigSpec.EnumValue<BarContent> CHAT_CONTENT;
 
     // ------------------------------------------------------------------ timing (ticks; 20 = 1s)
@@ -144,6 +146,16 @@ public final class MobHealthConfig {
         NAMEPLATE_CONTENT = BUILDER
                 .comment("What the nameplate shows: BAR (bar only), NUMBERS (health only), or BOTH.")
                 .defineEnum("content", BarContent.BOTH);
+        BUILDER.pop();
+
+        BUILDER.comment("Toast popup specific options.").push("toast");
+        TOAST_PROJECTILE_ICON = BUILDER
+                .comment("For ranged hits, which item the toast icon shows:",
+                        "  PROJECTILE = the arrow/trident itself",
+                        "  WEAPON     = the bow/crossbow that fired it",
+                        "Either way it degrades gracefully (projectile -> weapon -> held item -> heart),",
+                        "so modded projectiles (e.g. gun mods) still show something sensible.")
+                .defineEnum("projectileIcon", ProjectileIcon.PROJECTILE);
         BUILDER.pop();
 
         BUILDER.comment("How long (in ticks, 20 = 1s) nameplate/boss bars stay visible after the last hit.",
