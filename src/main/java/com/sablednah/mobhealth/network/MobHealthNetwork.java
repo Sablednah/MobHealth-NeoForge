@@ -28,7 +28,7 @@ public final class MobHealthNetwork {
      */
     private static void handleToast(ToastPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> com.sablednah.mobhealth.client.MobHealthToasts.show(
-                payload.name(), payload.damage(), payload.current(), payload.max()));
+                payload.name(), payload.damage(), payload.current(), payload.max(), payload.icon()));
     }
 
     /**

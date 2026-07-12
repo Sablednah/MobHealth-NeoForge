@@ -7,6 +7,7 @@ import net.minecraft.client.gui.components.toasts.ToastManager;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * A MobHealth toast popup (the top-right achievement-style notification): a small red heart plus
@@ -20,7 +21,9 @@ public class MobHealthToast implements Toast {
     /** Shared token so {@code getToast(MobHealthToast.class, TOKEN)} finds and refreshes the one toast. */
     public static final Object TOKEN = new Object();
 
-    private static final Identifier BACKGROUND = Identifier.withDefaultNamespace("toast/system");
+    // The advancement/achievement frame — a clean box with an icon slot on the left (the "system"
+    // toast has a gold "!" baked into its corner, so we use this one).
+    private static final Identifier BACKGROUND = Identifier.withDefaultNamespace("toast/advancement");
     private static final long DISPLAY_TIME_MS = 5000L;
 
     // 7x6 heart, 1 = red pixel.
@@ -35,19 +38,22 @@ public class MobHealthToast implements Toast {
 
     private Component title;
     private Component message;
+    private ItemStack icon;
     private long lastChanged;
     private boolean changed = true;
     private Visibility wantedVisibility = Visibility.HIDE;
 
-    public MobHealthToast(Component title, Component message) {
+    public MobHealthToast(Component title, Component message, ItemStack icon) {
         this.title = title;
         this.message = message;
+        this.icon = icon;
     }
 
-    /** Update the text and restart the display timer (called when the same mob is hit again). */
-    public void refresh(Component title, Component message) {
+    /** Update the text/icon and restart the display timer (called when the same mob is hit again). */
+    public void refresh(Component title, Component message, ItemStack icon) {
         this.title = title;
         this.message = message;
+        this.icon = icon;
         this.changed = true;
     }
 
@@ -74,7 +80,11 @@ public class MobHealthToast implements Toast {
     @Override
     public void render(GuiGraphics graphics, Font font, long time) {
         graphics.blitSprite(RenderPipelines.GUI_TEXTURED, BACKGROUND, 0, 0, width(), height());
-        drawHeart(graphics, 8, 10, 2);
+        if (icon != null && !icon.isEmpty()) {
+            graphics.renderItem(icon, 8, 8); // the weapon/arrow that dealt the damage
+        } else {
+            drawHeart(graphics, 8, 10, 2); // fallback
+        }
         graphics.drawString(font, title, 30, 7, 0xFFFFFF00, false);
         graphics.drawString(font, message, 30, 18, 0xFFFFFFFF, false);
     }

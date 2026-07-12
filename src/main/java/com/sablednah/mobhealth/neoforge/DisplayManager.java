@@ -21,8 +21,12 @@ import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.BossEvent;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
@@ -89,7 +93,7 @@ public final class DisplayManager {
             sendActionBar(viewers, victim, current, max);
         }
         if (MobHealthConfig.TOAST_ENABLED.get()) {
-            sendToast(viewers, victim, event.getNewDamage(), current, max);
+            sendToast(viewers, victim, event.getSource(), attacker, event.getNewDamage(), current, max);
         }
         if (MobHealthConfig.NAMEPLATE_ENABLED.get()) {
             updateNameplate(victim, current, max, category);
@@ -177,11 +181,25 @@ public final class DisplayManager {
 
     // ================================================================= toast
 
-    private void sendToast(List<ServerPlayer> viewers, LivingEntity victim, float damage, double current, double max) {
+    private void sendToast(List<ServerPlayer> viewers, LivingEntity victim, DamageSource source,
+                           ServerPlayer attacker, float damage, double current, double max) {
         String name = cleanName(victim).getString();
+        ItemStack icon = damageIcon(source, attacker);
         for (ServerPlayer viewer : viewers) {
-            PacketDistributor.sendToPlayer(viewer, new ToastPayload(name, damage, (float) current, (float) max));
+            PacketDistributor.sendToPlayer(viewer, new ToastPayload(name, damage, (float) current, (float) max, icon));
         }
+    }
+
+    /** The item that dealt the damage: an arrow for projectiles, else the weapon / main-hand item. */
+    private static ItemStack damageIcon(DamageSource source, ServerPlayer attacker) {
+        if (source.getDirectEntity() instanceof AbstractArrow) {
+            return new ItemStack(Items.ARROW);
+        }
+        ItemStack weapon = source.getWeaponItem();
+        if (weapon != null && !weapon.isEmpty()) {
+            return weapon;
+        }
+        return attacker.getMainHandItem(); // may be empty -> client shows the heart fallback
     }
 
     // ================================================================= nameplate
