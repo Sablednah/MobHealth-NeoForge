@@ -18,6 +18,17 @@ public final class MobHealthNetwork {
         // optional(): non-MobHealth (e.g. vanilla) clients may connect without this channel.
         PayloadRegistrar registrar = event.registrar("1").optional();
         registrar.playToClient(GraphicalGatePayload.TYPE, GraphicalGatePayload.CODEC, MobHealthNetwork::handleOnClient);
+        registrar.playToClient(ToastPayload.TYPE, ToastPayload.CODEC, MobHealthNetwork::handleToast);
+    }
+
+    /**
+     * Client-only handler for the toast packet. {@code MobHealthToasts} (which imports client
+     * classes) is referenced only inside the enqueued lambda, so it is loaded lazily on first run
+     * (client only) and never pulled in on a dedicated server during registration.
+     */
+    private static void handleToast(ToastPayload payload, IPayloadContext context) {
+        context.enqueueWork(() -> com.sablednah.mobhealth.client.MobHealthToasts.show(
+                payload.name(), payload.damage(), payload.current(), payload.max()));
     }
 
     /**

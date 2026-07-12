@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.sablednah.mobhealth.MobHealth;
 import com.sablednah.mobhealth.MobHealthConfig;
+import com.sablednah.mobhealth.network.ToastPayload;
 import com.sablednah.mobhealth.core.Audience;
 import com.sablednah.mobhealth.core.MobCategory;
 import com.sablednah.mobhealth.core.NameplateMode;
@@ -23,6 +24,7 @@ import net.minecraft.world.BossEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
@@ -85,6 +87,9 @@ public final class DisplayManager {
         }
         if (MobHealthConfig.ACTION_BAR_ENABLED.get()) {
             sendActionBar(viewers, victim, current, max);
+        }
+        if (MobHealthConfig.TOAST_ENABLED.get()) {
+            sendToast(viewers, victim, event.getNewDamage(), current, max);
         }
         if (MobHealthConfig.NAMEPLATE_ENABLED.get()) {
             updateNameplate(victim, current, max, category);
@@ -167,6 +172,15 @@ public final class DisplayManager {
                 .append(BarText.content(current, max, MobHealthConfig.ACTION_BAR_CONTENT.get()));
         for (ServerPlayer viewer : viewers) {
             viewer.displayClientMessage(line, true); // true = action bar (above hotbar)
+        }
+    }
+
+    // ================================================================= toast
+
+    private void sendToast(List<ServerPlayer> viewers, LivingEntity victim, float damage, double current, double max) {
+        String name = cleanName(victim).getString();
+        for (ServerPlayer viewer : viewers) {
+            PacketDistributor.sendToPlayer(viewer, new ToastPayload(name, damage, (float) current, (float) max));
         }
     }
 

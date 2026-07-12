@@ -45,6 +45,7 @@ bars are **client-rendered** and require the mod on the client.
 | **Action bar** | The same readout on the text line just above your hotbar | No |
 | **Nameplate** | A coloured health bar on the mob's name tag above its head | No |
 | **Boss bar** | The vanilla boss-bar widget at the top of your screen | No |
+| **Toast** | An achievement-style popup (top-right) with a heart, the mob's name and health | **Yes** |
 | **Graphical** | A crisp pixel health bar floating above the mob in the world | **Yes** |
 
 Bars are coloured by remaining health: **green → yellow → red**.
@@ -122,6 +123,7 @@ file apply as soon as you save; `/mobhealth reload` re-pushes settings to connec
 |-----|---------|--------|-------------|
 | `chat` | `true` | bool | Send a chat message to the viewer with damage dealt and health left. |
 | `actionBar` | `false` | bool | Show the readout on the action bar (text above the hotbar). |
+| `toast` | `false` | bool | Pop an achievement-style toast (top-right). Requires the mod on the client. |
 | `nameplate` | `true` | bool | Put a health bar on the mob's name tag. |
 | `bossBar` | `false` | bool | Show the top-of-screen boss-bar widget. |
 | `graphical` | `true` | bool | Allow modded clients to draw graphical floating bars. |
