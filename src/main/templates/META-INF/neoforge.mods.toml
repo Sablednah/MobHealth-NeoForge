@@ -13,7 +13,8 @@ description='''
 ${mod_description}
 '''
 displayURL="https://github.com/Sablednah/MobHealth-NeoForge"
-#logoFile="mobhealth.png"
+logoFile="mobhealth.png"
+logoBlur=false
 
 # Client rendering is done via a client-only entrypoint; the mod also works fully
 # server-side (nameplate bars, boss bars, chat) with vanilla clients.

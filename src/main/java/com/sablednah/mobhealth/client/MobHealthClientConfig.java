@@ -1,5 +1,7 @@
 package com.sablednah.mobhealth.client;
 
+import com.sablednah.mobhealth.core.BarStyle;
+
 import net.neoforged.neoforge.common.ModConfigSpec;
 
 /**
@@ -16,6 +18,8 @@ public final class MobHealthClientConfig {
     public static final ModConfigSpec.DoubleValue MAX_DISTANCE;
     public static final ModConfigSpec.IntValue BAR_WIDTH;
     public static final ModConfigSpec.IntValue BAR_HEIGHT;
+    public static final ModConfigSpec.EnumValue<BarStyle> BAR_STYLE;
+    public static final ModConfigSpec.IntValue GRAPHICAL_SEGMENTS;
     public static final ModConfigSpec.DoubleValue SCALE;
     public static final ModConfigSpec.BooleanValue SCALE_WITH_DISTANCE;
     public static final ModConfigSpec.BooleanValue FADE_WITH_DISTANCE;
@@ -36,6 +40,8 @@ public final class MobHealthClientConfig {
                 .defineInRange("maxDistance", 24.0D, 4.0D, 96.0D);
         BAR_WIDTH = BUILDER.comment("Bar width in pixels (at scale 1.0).").defineInRange("barWidth", 40, 8, 200);
         BAR_HEIGHT = BUILDER.comment("Bar height in pixels (at scale 1.0).").defineInRange("barHeight", 4, 1, 24);
+        BAR_STYLE = BUILDER.comment("Bar shape: SOLID, ROUNDED, SEGMENTED, or TAPERED (lens).").defineEnum("barStyle", BarStyle.SOLID);
+        GRAPHICAL_SEGMENTS = BUILDER.comment("Number of chunks for the SEGMENTED style.").defineInRange("segments", 10, 2, 50);
         SCALE = BUILDER.comment("Overall size multiplier for the bar (and its outline). 1.0 = the width/height above.")
                 .defineInRange("scale", 1.0D, 0.25D, 4.0D);
         SCALE_WITH_DISTANCE = BUILDER.comment("Shrink bars as the mob gets further away, so they feel anchored in the world.")

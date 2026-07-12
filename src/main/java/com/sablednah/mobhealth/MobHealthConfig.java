@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.sablednah.mobhealth.core.Audience;
 import com.sablednah.mobhealth.core.BarContent;
+import com.sablednah.mobhealth.core.BarStyle;
 import com.sablednah.mobhealth.core.Enforce;
 import com.sablednah.mobhealth.core.MobCategory;
 import com.sablednah.mobhealth.core.NameplateMode;
@@ -27,11 +28,13 @@ public final class MobHealthConfig {
 
     // ------------------------------------------------------------------ display modes
     public static final ModConfigSpec.BooleanValue CHAT_ENABLED;
+    public static final ModConfigSpec.BooleanValue ACTION_BAR_ENABLED;
     public static final ModConfigSpec.BooleanValue NAMEPLATE_ENABLED;
     public static final ModConfigSpec.BooleanValue BOSS_BAR_ENABLED;
     public static final ModConfigSpec.BooleanValue GRAPHICAL_ALLOWED;
     public static final ModConfigSpec.EnumValue<Audience> AUDIENCE;
     public static final ModConfigSpec.IntValue NEARBY_RADIUS;
+    public static final ModConfigSpec.EnumValue<BarContent> ACTION_BAR_CONTENT;
 
     // ------------------------------------------------------------------ target groups
     public static final ModConfigSpec.BooleanValue SHOW_FOR_HOSTILE;
@@ -79,16 +82,22 @@ public final class MobHealthConfig {
     public static final ModConfigSpec.DoubleValue ENFORCE_SCALE_VALUE;
     public static final ModConfigSpec.EnumValue<Enforce> ENFORCE_SCALE_WITH_DISTANCE;
     public static final ModConfigSpec.EnumValue<Enforce> ENFORCE_FADE_WITH_DISTANCE;
+    public static final ModConfigSpec.BooleanValue ENFORCE_BAR_STYLE;
+    public static final ModConfigSpec.EnumValue<BarStyle> ENFORCE_BAR_STYLE_VALUE;
+    public static final ModConfigSpec.BooleanValue ENFORCE_SEGMENTS;
+    public static final ModConfigSpec.IntValue ENFORCE_SEGMENTS_VALUE;
 
     static {
         BUILDER.comment("MobHealth — display modes. Enable any combination.").push("display");
         CHAT_ENABLED = BUILDER.comment("Message the viewer with damage dealt and health remaining.").define("chat", true);
+        ACTION_BAR_ENABLED = BUILDER.comment("Show the readout on the action bar (the text line above the hotbar). Works on vanilla clients.").define("actionBar", false);
         NAMEPLATE_ENABLED = BUILDER.comment("Show a health bar on the mob's name tag (works on vanilla clients).").define("nameplate", true);
         BOSS_BAR_ENABLED = BUILDER.comment("Show a boss-bar widget at the top of the screen (works on vanilla clients).").define("bossBar", false);
         GRAPHICAL_ALLOWED = BUILDER.comment("Allow clients that have MobHealth installed to draw graphical floating bars above mobs.").define("graphical", true);
         AUDIENCE = BUILDER.comment("Who sees the chat / boss bar / graphical displays. NAMEPLATE is a shared name tag and is always visible to everyone nearby.").defineEnum("audience", Audience.ATTACKER);
         NEARBY_RADIUS = BUILDER.comment("When audience = NEARBY, how many blocks away players still receive the display.").defineInRange("nearbyRadius", 32, 4, 128);
         CHAT_CONTENT = BUILDER.comment("What the chat message shows: BAR, NUMBERS, or BOTH.").defineEnum("chatContent", BarContent.BOTH);
+        ACTION_BAR_CONTENT = BUILDER.comment("What the action bar shows: BAR, NUMBERS, or BOTH.").defineEnum("actionBarContent", BarContent.BOTH);
         BUILDER.pop();
 
         BUILDER.comment("Which entities MobHealth reacts to. Per-entity overrides below beat these groups.").push("targets");
@@ -170,6 +179,10 @@ public final class MobHealthConfig {
         ENFORCE_SCALE_VALUE = BUILDER.comment("Forced scale when enforceScale = true.").defineInRange("scaleValue", 1.0D, 0.25D, 4.0D);
         ENFORCE_SCALE_WITH_DISTANCE = BUILDER.comment("Shrink bars with distance (world-anchored feel).").defineEnum("scaleWithDistance", Enforce.CLIENT);
         ENFORCE_FADE_WITH_DISTANCE = BUILDER.comment("Fade bars out near the max distance.").defineEnum("fadeWithDistance", Enforce.CLIENT);
+        ENFORCE_BAR_STYLE = BUILDER.comment("Force the graphical bar style (shape).").define("enforceBarStyle", false);
+        ENFORCE_BAR_STYLE_VALUE = BUILDER.comment("Forced style when enforceBarStyle = true: SOLID, ROUNDED, SEGMENTED, TAPERED.").defineEnum("barStyleValue", BarStyle.SOLID);
+        ENFORCE_SEGMENTS = BUILDER.comment("Force the SEGMENTED-style chunk count.").define("enforceSegments", false);
+        ENFORCE_SEGMENTS_VALUE = BUILDER.comment("Forced segment count when enforceSegments = true.").defineInRange("segmentsValue", 10, 2, 50);
         BUILDER.pop();
     }
 

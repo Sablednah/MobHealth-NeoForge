@@ -1,5 +1,7 @@
 package com.sablednah.mobhealth.network;
 
+import com.sablednah.mobhealth.core.BarStyle;
+
 /**
  * The graphical-bar policy the server pushes to a client: whether the client may draw bars, plus
  * per-option overrides. A {@code null} override means "let the client's own config decide"; a
@@ -21,11 +23,13 @@ public record GraphicalPolicy(
         Integer barHeight,
         Double scale,
         Boolean scaleWithDistance,
-        Boolean fadeWithDistance) {
+        Boolean fadeWithDistance,
+        BarStyle barStyle,
+        Integer segments) {
 
     /** No enforcement: allowed, and every option left to the client. Used on vanilla servers / logout. */
     public static final GraphicalPolicy DEFAULT = new GraphicalPolicy(
-            true, null, null, null, null, null, null, null, null, null, null, null, null);
+            true, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
 
     // Resolve helpers: server override if present, otherwise the supplied client value.
     public boolean requireLineOfSight(boolean clientValue) {
@@ -74,5 +78,13 @@ public record GraphicalPolicy(
 
     public boolean fadeWithDistance(boolean clientValue) {
         return fadeWithDistance != null ? fadeWithDistance : clientValue;
+    }
+
+    public BarStyle barStyle(BarStyle clientValue) {
+        return barStyle != null ? barStyle : clientValue;
+    }
+
+    public int segments(int clientValue) {
+        return segments != null ? segments : clientValue;
     }
 }

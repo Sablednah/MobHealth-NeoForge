@@ -1,3 +1,5 @@
+<p align="center"><img src="docs/banner.png" alt="MobHealth — Simple Damage Reporting" width="400"></p>
+
 # MobHealth (NeoForge)
 
 A modern **NeoForge** rewrite of the classic [MobHealth](https://github.com/Sablednah/Mobhealth)
@@ -40,6 +42,7 @@ bars are **client-rendered** and require the mod on the client.
 | Mode | What it looks like | Needs the mod on the client? |
 |------|--------------------|------------------------------|
 | **Chat** | `Zombie [\|\|\|\|\|\|\|\|\|\|] 14/20 (-6)` sent to you when you hit a mob | No |
+| **Action bar** | The same readout on the text line just above your hotbar | No |
 | **Nameplate** | A coloured health bar on the mob's name tag above its head | No |
 | **Boss bar** | The vanilla boss-bar widget at the top of your screen | No |
 | **Graphical** | A crisp pixel health bar floating above the mob in the world | **Yes** |
@@ -118,12 +121,14 @@ file apply as soon as you save; `/mobhealth reload` re-pushes settings to connec
 | Key | Default | Values | Description |
 |-----|---------|--------|-------------|
 | `chat` | `true` | bool | Send a chat message to the viewer with damage dealt and health left. |
+| `actionBar` | `false` | bool | Show the readout on the action bar (text above the hotbar). |
 | `nameplate` | `true` | bool | Put a health bar on the mob's name tag. |
 | `bossBar` | `false` | bool | Show the top-of-screen boss-bar widget. |
 | `graphical` | `true` | bool | Allow modded clients to draw graphical floating bars. |
 | `audience` | `ATTACKER` | `ATTACKER`, `NEARBY` | Who receives chat / boss bar / graphical. `NEARBY` = everyone within `nearbyRadius`. |
 | `nearbyRadius` | `32` | `4`–`128` | Radius (blocks) for `audience = NEARBY`. |
 | `chatContent` | `BOTH` | `BAR`, `NUMBERS`, `BOTH` | What the chat message includes. |
+| `actionBarContent` | `BOTH` | `BAR`, `NUMBERS`, `BOTH` | What the action bar shows. |
 
 #### `[targets]` — which mobs trigger a display
 
@@ -193,6 +198,8 @@ below); when it doesn't, these values apply.
 | `maxDistance` | `24.0` | `4.0`–`96.0` | Only draw bars for mobs within this many blocks. |
 | `barWidth` | `40` | `8`–`200` | Bar width in pixels (at scale 1.0). |
 | `barHeight` | `4` | `1`–`24` | Bar height in pixels (at scale 1.0). |
+| `barStyle` | `SOLID` | `SOLID`, `ROUNDED`, `SEGMENTED`, `TAPERED` | Bar shape. `SEGMENTED` = notched chunks; `TAPERED` = lens/leaf. |
+| `segments` | `10` | `2`–`50` | Number of chunks for the `SEGMENTED` style. |
 | `scale` | `1.0` | `0.25`–`4.0` | Overall size multiplier for the bar and its outline. |
 | `scaleWithDistance` | `false` | bool | Shrink bars as the mob gets further away, so they feel anchored in the world. |
 | `fadeWithDistance` | `false` | bool | Fade bars out as the mob approaches `maxDistance`. |
@@ -232,6 +239,8 @@ full control.
 | `enforceScale` / `scaleValue` | `false` / `1.0` | bool / `0.25`–`4.0` | `scale` |
 | `scaleWithDistance` | `CLIENT` | `CLIENT`/`ON`/`OFF` | `scaleWithDistance` |
 | `fadeWithDistance` | `CLIENT` | `CLIENT`/`ON`/`OFF` | `fadeWithDistance` |
+| `enforceBarStyle` / `barStyleValue` | `false` / `SOLID` | bool / style | `barStyle` |
+| `enforceSegments` / `segmentsValue` | `false` / `10` | bool / `2`–`50` | `segments` |
 
 > To disable graphical bars entirely from the server, set `[display] graphical = false` — that turns
 > them off for all modded clients.

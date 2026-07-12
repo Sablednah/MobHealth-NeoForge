@@ -4,6 +4,7 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector4f;
 
+import com.sablednah.mobhealth.core.BarStyle;
 import com.sablednah.mobhealth.core.HealthBarFormatter;
 import com.sablednah.mobhealth.core.HealthBarFormatter.ValueStyle;
 import com.sablednah.mobhealth.network.GraphicalGateState;
@@ -84,6 +85,8 @@ public final class GraphicalBarRenderer {
         boolean fadeWithDistance = policy.fadeWithDistance(MobHealthClientConfig.FADE_WITH_DISTANCE.get());
         int baseWidth = policy.barWidth(MobHealthClientConfig.BAR_WIDTH.get());
         int baseHeight = policy.barHeight(MobHealthClientConfig.BAR_HEIGHT.get());
+        BarStyle style = policy.barStyle(MobHealthClientConfig.BAR_STYLE.get());
+        int segments = policy.segments(MobHealthClientConfig.GRAPHICAL_SEGMENTS.get());
 
         for (Entity entity : mc.level.entitiesForRendering()) {
             if (!(entity instanceof LivingEntity living) || !living.isAlive() || living == mc.player) {
@@ -156,23 +159,25 @@ public final class GraphicalBarRenderer {
             int sy = Math.round((1.0F - (ndcY * 0.5F + 0.5F)) * screenH);
             drawBar(graphics, mc, sx, sy, health, max, width, height,
                     policy.showBackground(MobHealthClientConfig.SHOW_BACKGROUND.get()),
-                    policy.showText(MobHealthClientConfig.SHOW_TEXT.get()), alpha);
+                    policy.showText(MobHealthClientConfig.SHOW_TEXT.get()), alpha, style, segments);
         }
     }
 
     private static void drawBar(GuiGraphics graphics, Minecraft mc, int cx, int cy, float health, float max,
-                                int width, int height, boolean showBackground, boolean showText, float alpha) {
+                                int width, int height, boolean showBackground, boolean showText, float alpha,
+                                BarStyle style, int segments) {
         int left = cx - width / 2;
         int top = cy - height / 2;
         float fraction = Math.max(0.0F, Math.min(health / max, 1.0F));
+        int fillColor = withAlpha(colorFor(fraction), alpha);
+        int trackColor = withAlpha(0xFF3A3A3A, alpha);
+        int bgColor = withAlpha(0xC0000000, alpha);
 
-        if (showBackground) {
-            graphics.fill(left - 1, top - 1, left + width + 1, top + height + 1, withAlpha(0xC0000000, alpha));
-        }
-        graphics.fill(left, top, left + width, top + height, withAlpha(0xFF3A3A3A, alpha));
-        int filledWidth = Math.round(width * fraction);
-        if (filledWidth > 0) {
-            graphics.fill(left, top, left + filledWidth, top + height, withAlpha(colorFor(fraction), alpha));
+        switch (style) {
+            case SEGMENTED -> drawSegmented(graphics, left, top, width, height, fraction, showBackground, bgColor, trackColor, fillColor, segments);
+            case TAPERED -> drawTapered(graphics, left, top, width, height, fraction, showBackground, bgColor, trackColor, fillColor);
+            case ROUNDED -> drawRounded(graphics, left, top, width, height, fraction, showBackground, bgColor, trackColor, fillColor);
+            default -> drawSolid(graphics, left, top, width, height, fraction, showBackground, bgColor, trackColor, fillColor);
         }
 
         if (showText) {
@@ -180,6 +185,84 @@ public final class GraphicalBarRenderer {
             int textX = cx - mc.font.width(text) / 2;
             graphics.drawString(mc.font, text, textX, top - 10, withAlpha(0xFFFFFFFF, alpha));
         }
+    }
+
+    private static void drawSolid(GuiGraphics g, int left, int top, int w, int h, float frac,
+                                  boolean bg, int bgColor, int track, int fill) {
+        if (bg) {
+            g.fill(left - 1, top - 1, left + w + 1, top + h + 1, bgColor);
+        }
+        g.fill(left, top, left + w, top + h, track);
+        int fw = Math.round(w * frac);
+        if (fw > 0) {
+            g.fill(left, top, left + fw, top + h, fill);
+        }
+    }
+
+    private static void drawSegmented(GuiGraphics g, int left, int top, int w, int h, float frac,
+                                      boolean bg, int bgColor, int track, int fill, int segments) {
+        int segs = Math.max(2, segments);
+        if (bg) {
+            g.fill(left - 1, top - 1, left + w + 1, top + h + 1, bgColor);
+        }
+        int gap = 1;
+        int chunkW = Math.max(1, (w - gap * (segs - 1)) / segs);
+        int filledSegs = HealthBarFormatter.filledSegments(frac, 1.0, segs);
+        int x = left;
+        for (int i = 0; i < segs; i++) {
+            g.fill(x, top, x + chunkW, top + h, i < filledSegs ? fill : track);
+            x += chunkW + gap;
+        }
+    }
+
+    private static void drawTapered(GuiGraphics g, int left, int top, int w, int h, float frac,
+                                    boolean bg, int bgColor, int track, int fill) {
+        int fw = Math.round(w * frac);
+        float halfW = w / 2.0F;
+        for (int i = 0; i < w; i++) {
+            float t = (i + 0.5F - halfW) / halfW;                  // -1..1 across the width
+            float shape = (float) Math.sqrt(Math.max(0.0, 1.0 - t * t)); // 1 centre -> 0 ends (ellipse)
+            int colH = Math.max(1, Math.round(h * (0.25F + 0.75F * shape)));
+            int y0 = top + Math.round((h - colH) / 2.0F);
+            if (bg) {
+                g.fill(left + i, y0 - 1, left + i + 1, y0 + colH + 1, bgColor);
+            }
+            g.fill(left + i, y0, left + i + 1, y0 + colH, i < fw ? fill : track);
+        }
+    }
+
+    private static void drawRounded(GuiGraphics g, int left, int top, int w, int h, float frac,
+                                    boolean bg, int bgColor, int track, int fill) {
+        int r = Math.min(2, Math.min(w, h) / 2);
+        if (bg) {
+            fillRounded(g, left - 1, top - 1, w + 2, h + 2, r + 1, bgColor);
+        }
+        fillRounded(g, left, top, w, h, r, track);
+        int fw = Math.round(w * frac);
+        if (fw > 0) {
+            fillRoundedLeft(g, left, top, fw, h, r, fill);
+        }
+    }
+
+    /** Filled rectangle with all four corners clipped by {@code r} (rounded look). */
+    private static void fillRounded(GuiGraphics g, int x, int y, int w, int h, int r, int color) {
+        if (r <= 0) {
+            g.fill(x, y, x + w, y + h, color);
+            return;
+        }
+        g.fill(x + r, y, x + w - r, y + h, color);          // centre band, full height
+        g.fill(x, y + r, x + r, y + h - r, color);          // left edge (corners clipped)
+        g.fill(x + w - r, y + r, x + w, y + h - r, color);  // right edge (corners clipped)
+    }
+
+    /** Filled rectangle with only the LEFT corners rounded; right edge is a straight cut. */
+    private static void fillRoundedLeft(GuiGraphics g, int x, int y, int w, int h, int r, int color) {
+        if (r <= 0 || w <= r) {
+            g.fill(x, y, x + w, y + h, color);
+            return;
+        }
+        g.fill(x + r, y, x + w, y + h, color);      // body from x+r, full height, straight right
+        g.fill(x, y + r, x + r, y + h - r, color);  // left edge (corners clipped)
     }
 
     private static int colorFor(float fraction) {

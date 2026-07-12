@@ -83,6 +83,9 @@ public final class DisplayManager {
         if (MobHealthConfig.CHAT_ENABLED.get()) {
             sendChat(viewers, victim, event.getNewDamage(), current, max);
         }
+        if (MobHealthConfig.ACTION_BAR_ENABLED.get()) {
+            sendActionBar(viewers, victim, current, max);
+        }
         if (MobHealthConfig.NAMEPLATE_ENABLED.get()) {
             updateNameplate(victim, current, max, category);
         }
@@ -152,6 +155,18 @@ public final class DisplayManager {
                 .append(Component.literal(" (-" + trim(damage) + ")").withStyle(ChatFormatting.GRAY));
         for (ServerPlayer viewer : viewers) {
             viewer.displayClientMessage(line, false);
+        }
+    }
+
+    // ================================================================= action bar
+
+    private void sendActionBar(List<ServerPlayer> viewers, LivingEntity victim, double current, double max) {
+        MutableComponent line = Component.empty()
+                .append(cleanName(victim))
+                .append(Component.literal(" "))
+                .append(BarText.content(current, max, MobHealthConfig.ACTION_BAR_CONTENT.get()));
+        for (ServerPlayer viewer : viewers) {
+            viewer.displayClientMessage(line, true); // true = action bar (above hotbar)
         }
     }
 

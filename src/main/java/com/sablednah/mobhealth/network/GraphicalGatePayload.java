@@ -1,6 +1,7 @@
 package com.sablednah.mobhealth.network;
 
 import com.sablednah.mobhealth.MobHealth;
+import com.sablednah.mobhealth.core.BarStyle;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -36,14 +37,31 @@ public record GraphicalGatePayload(GraphicalPolicy policy) implements CustomPack
         writeOptDouble(buf, p.scale());
         writeOptBool(buf, p.scaleWithDistance());
         writeOptBool(buf, p.fadeWithDistance());
+        writeOptInt(buf, p.barStyle() == null ? null : p.barStyle().ordinal());
+        writeOptInt(buf, p.segments());
     }
 
     private static GraphicalGatePayload decode(RegistryFriendlyByteBuf buf) {
+        boolean allowed = buf.readBoolean();
+        Boolean requireLos = readOptBool(buf);
+        Boolean showText = readOptBool(buf);
+        Boolean showBackground = readOptBool(buf);
+        Boolean showPlayers = readOptBool(buf);
+        Boolean onlyWhenDamaged = readOptBool(buf);
+        Double verticalOffset = readOptDouble(buf);
+        Double maxDistance = readOptDouble(buf);
+        Integer barWidth = readOptInt(buf);
+        Integer barHeight = readOptInt(buf);
+        Double scale = readOptDouble(buf);
+        Boolean scaleWithDistance = readOptBool(buf);
+        Boolean fadeWithDistance = readOptBool(buf);
+        Integer styleOrdinal = readOptInt(buf);
+        BarStyle barStyle = styleOrdinal == null ? null : BarStyle.values()[styleOrdinal];
+        Integer segments = readOptInt(buf);
         return new GraphicalGatePayload(new GraphicalPolicy(
-                buf.readBoolean(),
-                readOptBool(buf), readOptBool(buf), readOptBool(buf), readOptBool(buf), readOptBool(buf),
-                readOptDouble(buf), readOptDouble(buf), readOptInt(buf), readOptInt(buf),
-                readOptDouble(buf), readOptBool(buf), readOptBool(buf)));
+                allowed, requireLos, showText, showBackground, showPlayers, onlyWhenDamaged,
+                verticalOffset, maxDistance, barWidth, barHeight, scale, scaleWithDistance, fadeWithDistance,
+                barStyle, segments));
     }
 
     private static void writeOptBool(RegistryFriendlyByteBuf buf, Boolean value) {
