@@ -117,7 +117,7 @@ file apply as soon as you save; `/mobhealth reload` re-pushes settings to connec
 
 ### Server / common config (`mobhealth-common.toml`)
 
-#### `[display]` — which modes are on
+#### `[display]` — the master on/off switch for each mode
 
 | Key | Default | Values | Description |
 |-----|---------|--------|-------------|
@@ -127,10 +127,17 @@ file apply as soon as you save; `/mobhealth reload` re-pushes settings to connec
 | `nameplate` | `true` | bool | Put a health bar on the mob's name tag. |
 | `bossBar` | `false` | bool | Show the top-of-screen boss-bar widget. |
 | `graphical` | `true` | bool | Allow modded clients to draw graphical floating bars. |
-| `audience` | `ATTACKER` | `ATTACKER`, `NEARBY` | Who receives chat / boss bar / graphical. `NEARBY` = everyone within `nearbyRadius`. |
+
+Each mode's own options are in its matching section below.
+
+#### `[audience]` — who receives the per-viewer displays
+
+Applies to chat, action bar, boss bar, toast, and graphical. (The nameplate is a shared name tag, always visible to everyone nearby.)
+
+| Key | Default | Values | Description |
+|-----|---------|--------|-------------|
+| `audience` | `ATTACKER` | `ATTACKER`, `NEARBY` | `ATTACKER` = only the player who hit the mob; `NEARBY` = everyone within `nearbyRadius`. |
 | `nearbyRadius` | `32` | `4`–`128` | Radius (blocks) for `audience = NEARBY`. |
-| `chatContent` | `BOTH` | `BAR`, `NUMBERS`, `BOTH` | What the chat message includes. |
-| `actionBarContent` | `BOTH` | `BAR`, `NUMBERS`, `BOTH` | What the action bar shows. |
 
 #### `[targets]` — which mobs trigger a display
 
@@ -150,20 +157,17 @@ Example `overrides`:
 overrides = ["minecraft:villager=false", "minecraft:ender_dragon=true", "somemod:custom_boss=true"]
 ```
 
-#### `[bar]` — text bar appearance (chat & nameplate)
+#### `[chat]`
 
 | Key | Default | Values | Description |
 |-----|---------|--------|-------------|
-| `segments` | `20` | `1`–`100` | Number of segments in the bar. |
-| `filledChar` | `"\|"` | string | Glyph for a filled segment. |
-| `emptyChar` | `"\|"` | string | Glyph for a depleted segment. Keep it the **same** as `filledChar` for a constant-width bar (depleted segments are simply dimmed). A different glyph like `" "` gives the classic `[\|\|\|   ]` look but the bar changes width as health changes, because Minecraft's font is proportional. |
-| `valueStyle` | `CURRENT_MAX` | `NONE`, `CURRENT_MAX`, `PERCENT` | Numeric readout: none, `14/20`, or `70%`. |
+| `chatContent` | `BOTH` | `BAR`, `NUMBERS`, `BOTH` | What the chat message includes. |
 
-#### `[bossbar]`
+#### `[actionbar]`
 
 | Key | Default | Values | Description |
 |-----|---------|--------|-------------|
-| `color` | `RED` | `PINK`, `BLUE`, `RED`, `GREEN`, `YELLOW`, `PURPLE`, `WHITE` | Boss-bar colour. |
+| `actionBarContent` | `BOTH` | `BAR`, `NUMBERS`, `BOTH` | What the action bar shows. |
 
 #### `[nameplate]`
 
@@ -171,6 +175,27 @@ overrides = ["minecraft:villager=false", "minecraft:ender_dragon=true", "somemod
 |-----|---------|--------|-------------|
 | `mode` | `ON_DAMAGE` | `ON_DAMAGE`, `NAMED_ONLY`, `ALWAYS` | `ON_DAMAGE`: show a bar briefly after each hit, then revert. `NAMED_ONLY`: only decorate mobs that already have a name tag. `ALWAYS`: show after a hit and keep it. |
 | `content` | `BOTH` | `BAR`, `NUMBERS`, `BOTH` | What the nameplate shows. |
+
+#### `[bossbar]`
+
+| Key | Default | Values | Description |
+|-----|---------|--------|-------------|
+| `color` | `RED` | `PINK`, `BLUE`, `RED`, `GREEN`, `YELLOW`, `PURPLE`, `WHITE` | Boss-bar colour. |
+
+#### `[toast]`
+
+| Key | Default | Values | Description |
+|-----|---------|--------|-------------|
+| `projectileIcon` | `PROJECTILE` | `PROJECTILE`, `WEAPON` | For ranged hits, show the projectile (arrow/trident) or the firing weapon (bow/crossbow). Falls back gracefully for modded projectiles. |
+
+#### `[bar]` — text bar appearance (chat, action bar, nameplate)
+
+| Key | Default | Values | Description |
+|-----|---------|--------|-------------|
+| `segments` | `20` | `1`–`100` | Number of segments in the bar. |
+| `filledChar` | `"\|"` | string | Glyph for a filled segment. |
+| `emptyChar` | `"\|"` | string | Glyph for a depleted segment. Keep it the **same** as `filledChar` for a constant-width bar (depleted segments are simply dimmed). A different glyph like `" "` gives the classic `[\|\|\|   ]` look but the bar changes width as health changes, because Minecraft's font is proportional. |
+| `valueStyle` | `CURRENT_MAX` | `NONE`, `CURRENT_MAX`, `PERCENT` | Numeric readout: none, `14/20`, or `70%`. |
 
 #### `[timing]` — how long bars linger (in ticks; 20 ticks = 1 second)
 

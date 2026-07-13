@@ -91,17 +91,20 @@ public final class MobHealthConfig {
     public static final ModConfigSpec.IntValue ENFORCE_SEGMENTS_VALUE;
 
     static {
-        BUILDER.comment("MobHealth — display modes. Enable any combination.").push("display");
+        BUILDER.comment("Display modes — the master on/off switch for each. Enable any combination.",
+                "Each mode's own options live in its matching section below ([chat], [nameplate], ...).").push("display");
         CHAT_ENABLED = BUILDER.comment("Message the viewer with damage dealt and health remaining.").define("chat", true);
         ACTION_BAR_ENABLED = BUILDER.comment("Show the readout on the action bar (the text line above the hotbar). Works on vanilla clients.").define("actionBar", false);
         TOAST_ENABLED = BUILDER.comment("Pop an achievement-style toast (top-right) with the mob's health. Requires this mod on the client.").define("toast", false);
         NAMEPLATE_ENABLED = BUILDER.comment("Show a health bar on the mob's name tag (works on vanilla clients).").define("nameplate", true);
         BOSS_BAR_ENABLED = BUILDER.comment("Show a boss-bar widget at the top of the screen (works on vanilla clients).").define("bossBar", false);
         GRAPHICAL_ALLOWED = BUILDER.comment("Allow clients that have MobHealth installed to draw graphical floating bars above mobs.").define("graphical", true);
-        AUDIENCE = BUILDER.comment("Who sees the chat / boss bar / graphical displays. NAMEPLATE is a shared name tag and is always visible to everyone nearby.").defineEnum("audience", Audience.ATTACKER);
+        BUILDER.pop();
+
+        BUILDER.comment("Who receives the per-viewer displays (chat, action bar, boss bar, toast, graphical).",
+                "The NAMEPLATE is a shared name tag and is always visible to everyone nearby.").push("audience");
+        AUDIENCE = BUILDER.comment("ATTACKER = only the player who hit the mob; NEARBY = everyone within nearbyRadius.").defineEnum("audience", Audience.ATTACKER);
         NEARBY_RADIUS = BUILDER.comment("When audience = NEARBY, how many blocks away players still receive the display.").defineInRange("nearbyRadius", 32, 4, 128);
-        CHAT_CONTENT = BUILDER.comment("What the chat message shows: BAR, NUMBERS, or BOTH.").defineEnum("chatContent", BarContent.BOTH);
-        ACTION_BAR_CONTENT = BUILDER.comment("What the action bar shows: BAR, NUMBERS, or BOTH.").defineEnum("actionBarContent", BarContent.BOTH);
         BUILDER.pop();
 
         BUILDER.comment("Which entities MobHealth reacts to. Per-entity overrides below beat these groups.").push("targets");
@@ -120,24 +123,17 @@ public final class MobHealthConfig {
                         o -> o instanceof String s && s.contains("="));
         BUILDER.pop();
 
-        BUILDER.comment("Appearance of the text bar used by chat and nameplate modes.").push("bar");
-        BAR_SEGMENTS = BUILDER.comment("Number of segments in the text bar.").defineInRange("segments", 20, 1, 100);
-        BAR_FILLED_CHAR = BUILDER.comment("Glyph for a filled segment.").define("filledChar", "|");
-        BAR_EMPTY_CHAR = BUILDER
-                .comment("Glyph for a depleted segment.",
-                        "Minecraft's font is proportional (a space is wider than '|'), so using a DIFFERENT",
-                        "glyph here (e.g. a space) makes the bar change width as health changes.",
-                        "Keep this the SAME as filledChar (the default) for a constant-width bar — depleted",
-                        "segments are simply shown dimmed.")
-                .define("emptyChar", "|");
-        VALUE_STYLE = BUILDER.comment("How to render the numeric health readout.").defineEnum("valueStyle", ValueStyle.CURRENT_MAX);
+        // ---- per-mode options (each mode's master toggle is in [display] above) ----
+
+        BUILDER.comment("Chat mode options.").push("chat");
+        CHAT_CONTENT = BUILDER.comment("What the chat message shows: BAR, NUMBERS, or BOTH.").defineEnum("chatContent", BarContent.BOTH);
         BUILDER.pop();
 
-        BUILDER.comment("Boss-bar specific options.").push("bossbar");
-        BOSS_BAR_COLOR = BUILDER.comment("Boss-bar colour: PINK, BLUE, RED, GREEN, YELLOW, PURPLE, WHITE.").define("color", "RED");
+        BUILDER.comment("Action bar mode options.").push("actionbar");
+        ACTION_BAR_CONTENT = BUILDER.comment("What the action bar shows: BAR, NUMBERS, or BOTH.").defineEnum("actionBarContent", BarContent.BOTH);
         BUILDER.pop();
 
-        BUILDER.comment("Nameplate specific options.").push("nameplate");
+        BUILDER.comment("Nameplate mode options.").push("nameplate");
         NAMEPLATE_MODE = BUILDER
                 .comment("ON_DAMAGE: show a bar briefly after each hit, then revert.",
                         "NAMED_ONLY: only augment mobs that already have a name tag.",
@@ -148,7 +144,11 @@ public final class MobHealthConfig {
                 .defineEnum("content", BarContent.BOTH);
         BUILDER.pop();
 
-        BUILDER.comment("Toast popup specific options.").push("toast");
+        BUILDER.comment("Boss-bar mode options.").push("bossbar");
+        BOSS_BAR_COLOR = BUILDER.comment("Boss-bar colour: PINK, BLUE, RED, GREEN, YELLOW, PURPLE, WHITE.").define("color", "RED");
+        BUILDER.pop();
+
+        BUILDER.comment("Toast mode options.").push("toast");
         TOAST_PROJECTILE_ICON = BUILDER
                 .comment("For ranged hits, which item the toast icon shows:",
                         "  PROJECTILE = the arrow/trident itself",
@@ -156,6 +156,19 @@ public final class MobHealthConfig {
                         "Either way it degrades gracefully (projectile -> weapon -> held item -> heart),",
                         "so modded projectiles (e.g. gun mods) still show something sensible.")
                 .defineEnum("projectileIcon", ProjectileIcon.PROJECTILE);
+        BUILDER.pop();
+
+        BUILDER.comment("Appearance of the TEXT bar used by the chat, action bar and nameplate modes.").push("bar");
+        BAR_SEGMENTS = BUILDER.comment("Number of segments in the text bar.").defineInRange("segments", 20, 1, 100);
+        BAR_FILLED_CHAR = BUILDER.comment("Glyph for a filled segment.").define("filledChar", "|");
+        BAR_EMPTY_CHAR = BUILDER
+                .comment("Glyph for a depleted segment.",
+                        "Minecraft's font is proportional (a space is wider than '|'), so using a DIFFERENT",
+                        "glyph here (e.g. a space) makes the bar change width as health changes.",
+                        "Keep this the SAME as filledChar (the default) for a constant-width bar — depleted",
+                        "segments are simply shown dimmed.")
+                .define("emptyChar", "|");
+        VALUE_STYLE = BUILDER.comment("How to render the numeric health readout.").defineEnum("valueStyle", ValueStyle.CURRENT_MAX);
         BUILDER.pop();
 
         BUILDER.comment("How long (in ticks, 20 = 1s) nameplate/boss bars stay visible after the last hit.",

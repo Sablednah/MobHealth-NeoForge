@@ -3,6 +3,7 @@
 
   "mobhealth.configuration.display": "Display Modes",
   "mobhealth.configuration.targets": "Target Entities",
+  "mobhealth.configuration.actionbar": "Action Bar",
   "mobhealth.configuration.bar": "Text Bar Appearance",
   "mobhealth.configuration.bossbar": "Boss Bar",
   "mobhealth.configuration.nameplate": "Nameplate",
