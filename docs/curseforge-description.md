@@ -19,34 +19,34 @@ Or shows you a floating health bar above its head. Or a boss bar. Or a name-tag 
     <td align="center" width="33%">
       <img src="https://media.forgecdn.net/attachments/description/1608871/description_5d33a378-d5df-4786-a7e5-ad04362709e7.png" alt="Graphical display mode" width="100%"><br>
       <b>Graphical</b><br>
-      <sub>A floating pixel bar above the mob</sub>
+      A floating bar above the mob 
     </td>
     <td align="center" width="33%">
       <img src="https://media.forgecdn.net/attachments/description/1608871/description_1642c25b-61ff-41fc-9910-d12a577ee356.png" alt="Toast display mode" width="100%"><br>
       <b>Toast</b><br>
-      <sub>An achievement-style popup, with the weapon used</sub>
+      Popup, with the weapon used
     </td>
     <td align="center" width="33%">
       <img src="https://media.forgecdn.net/attachments/description/1608871/description_1eacbae6-3c6b-45fa-abf5-ddddce3ca56e.png" alt="Chat display mode" width="100%"><br>
       <b>Chat</b><br>
-      <sub>Damage and health, in your chat log</sub>
+      Damage and health, in chat log
     </td>
   </tr>
   <tr>
     <td align="center" width="33%">
       <img src="https://media.forgecdn.net/attachments/description/1608871/description_7e17833d-d5b4-4c0f-9a41-074d4b27bbd0.png" alt="Action bar display mode" width="100%"><br>
       <b>Action bar</b><br>
-      <sub>The readout above your hotbar</sub>
+      The readout above your hotbar
     </td>
     <td align="center" width="33%">
       <img src="https://media.forgecdn.net/attachments/description/1608871/description_6f1809e4-8127-47de-8759-94ba85bcdeff.png" alt="Nameplate display mode" width="100%"><br>
       <b>Nameplate</b><br>
-      <sub>A health bar on the mob's name tag</sub>
+      Health bar on the mob's name tag
     </td>
     <td align="center" width="33%">
       <img src="https://media.forgecdn.net/attachments/description/1608871/description_f77542be-769d-4137-9852-3b4d81471ffa.png" alt="Boss bar display mode" width="100%"><br>
       <b>Boss bar</b><br>
-      <sub>The vanilla widget at the top of the screen</sub>
+      Vanilla bar, top of the screen
     </td>
   </tr>
 </table>
