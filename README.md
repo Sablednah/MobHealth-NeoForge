@@ -122,9 +122,9 @@ file apply as soon as you save; `/mobhealth reload` re-pushes settings to connec
 | Key | Default | Values | Description |
 |-----|---------|--------|-------------|
 | `chat` | `true` | bool | Send a chat message to the viewer with damage dealt and health left. |
-| `actionBar` | `false` | bool | Show the readout on the action bar (text above the hotbar). |
+| `actionBar` | `true` | bool | Show the readout on the action bar (text above the hotbar). |
 | `toast` | `false` | bool | Pop an achievement-style toast (top-right). Requires the mod on the client. |
-| `nameplate` | `true` | bool | Put a health bar on the mob's name tag. |
+| `nameplate` | `false` | bool | Put a health bar on the mob's name tag. |
 | `bossBar` | `false` | bool | Show the top-of-screen boss-bar widget. |
 | `graphical` | `true` | bool | Allow modded clients to draw graphical floating bars. |
 

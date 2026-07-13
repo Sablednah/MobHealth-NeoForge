@@ -94,9 +94,9 @@ public final class MobHealthConfig {
         BUILDER.comment("Display modes — the master on/off switch for each. Enable any combination.",
                 "Each mode's own options live in its matching section below ([chat], [nameplate], ...).").push("display");
         CHAT_ENABLED = BUILDER.comment("Message the viewer with damage dealt and health remaining.").define("chat", true);
-        ACTION_BAR_ENABLED = BUILDER.comment("Show the readout on the action bar (the text line above the hotbar). Works on vanilla clients.").define("actionBar", false);
+        ACTION_BAR_ENABLED = BUILDER.comment("Show the readout on the action bar (the text line above the hotbar). Works on vanilla clients.").define("actionBar", true);
         TOAST_ENABLED = BUILDER.comment("Pop an achievement-style toast (top-right) with the mob's health. Requires this mod on the client.").define("toast", false);
-        NAMEPLATE_ENABLED = BUILDER.comment("Show a health bar on the mob's name tag (works on vanilla clients).").define("nameplate", true);
+        NAMEPLATE_ENABLED = BUILDER.comment("Show a health bar on the mob's name tag (works on vanilla clients).").define("nameplate", false);
         BOSS_BAR_ENABLED = BUILDER.comment("Show a boss-bar widget at the top of the screen (works on vanilla clients).").define("bossBar", false);
         GRAPHICAL_ALLOWED = BUILDER.comment("Allow clients that have MobHealth installed to draw graphical floating bars above mobs.").define("graphical", true);
         BUILDER.pop();
