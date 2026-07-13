@@ -133,4 +133,4 @@ Changes apply as soon as you save. The full config reference, plus ready-made re
 
 MobHealth was originally a Bukkit plugin (2011–2016, ~1 million downloads) by Sablednah. This is a complete rewrite for NeoForge by the same author — none of the original code carries over, but the spirit does. Licensed **MIT**.
 
-Bug reports, feature requests and source: **https://github.com/Sablednah/MobHealth-Forge**
+Bug reports, feature requests and source: **https://github.com/Sablednah/MobHealth-NeoForge**
