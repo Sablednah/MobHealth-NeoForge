@@ -35,9 +35,46 @@ graphical floating bars.
 
 ## Display modes
 
-All four modes can be enabled independently and combined freely. The first three are **server-side**
-and work on **unmodified vanilla clients** — players don't need to install anything. The graphical
-bars are **client-rendered** and require the mod on the client.
+All six modes can be enabled independently and combined freely. The first four are **server-side**
+and work on **unmodified vanilla clients** — players don't need to install anything. Toasts and
+graphical bars are **client-rendered** and require the mod on the client.
+
+<table>
+  <tr>
+    <td align="center" width="33%">
+      <img src="docs/chat.png" alt="Chat display mode" width="100%"><br>
+      <b>Chat</b><br>
+      <sub>Damage and health, in your chat log</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="docs/action.png" alt="Action bar display mode" width="100%"><br>
+      <b>Action bar</b><br>
+      <sub>The readout above your hotbar</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="docs/nameplate.png" alt="Nameplate display mode" width="100%"><br>
+      <b>Nameplate</b><br>
+      <sub>A health bar on the mob's name tag</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="33%">
+      <img src="docs/bossbar.png" alt="Boss bar display mode" width="100%"><br>
+      <b>Boss bar</b><br>
+      <sub>The vanilla widget at the top of the screen</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="docs/toast.png" alt="Toast display mode" width="100%"><br>
+      <b>Toast</b><br>
+      <sub>An achievement-style popup, with the weapon used</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="docs/graphic-bar.png" alt="Graphical display mode" width="100%"><br>
+      <b>Graphical</b><br>
+      <sub>A floating pixel bar above the mob</sub>
+    </td>
+  </tr>
+</table>
 
 | Mode | What it looks like | Needs the mod on the client? |
 |------|--------------------|------------------------------|
