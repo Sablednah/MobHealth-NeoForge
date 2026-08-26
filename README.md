@@ -35,9 +35,9 @@ graphical floating bars.
 
 ## Display modes
 
-All six modes can be enabled independently and combined freely. The first four are **server-side**
-and work on **unmodified vanilla clients** — players don't need to install anything. Toasts and
-graphical bars are **client-rendered** and require the mod on the client.
+All seven modes can be enabled independently and combined freely. The first four are **server-side**
+and work on **unmodified vanilla clients** — players don't need to install anything. Toasts, graphical
+bars and damage indicators are **client-rendered** and require the mod on the client.
 
 <table>
   <tr>
@@ -84,8 +84,15 @@ graphical bars are **client-rendered** and require the mod on the client.
 | **Boss bar** | The vanilla boss-bar widget at the top of your screen | No |
 | **Toast** | An achievement-style popup (top-right) with a heart, the mob's name and health | **Yes** |
 | **Graphical** | A crisp pixel health bar floating above the mob in the world | **Yes** |
+| **Damage indicators** | Red numbers that pop off the mob for each hit, rise and fade | **Yes** |
 
 Bars are coloured by remaining health: **green → yellow → red**.
+
+**Damage indicators** are the one mode that reports the *hit* rather than the *state*: each blow
+throws a red number into the world where it landed, which drifts upward and fades over about a
+second. The killing blow is drawn bold, larger and amber. They need the mod on **both** sides — the
+client cannot work the number out for itself, because the health it can see has already changed and
+a drop in health is not the same thing as a hit (absorption, regeneration and healing all move it).
 
 > **Note on the nameplate:** a name tag is a single shared property on the mob, so *everyone* nearby
 > sees the same one. The per-player `audience`, the personal mute (`/mobhealth toggle`), and the
@@ -102,7 +109,7 @@ Download / build `mobhealth-<version>.jar` and drop it into the `mods/` folder.
 - **Dedicated server:** install on the server. Chat, nameplate, and boss bar work for **every**
   player, vanilla or modded. Players who *also* install the mod additionally get the graphical bars.
 - **Client only (e.g. on a vanilla server):** you'll see graphical bars for any mob you can see; the
-  server can't send you chat/boss-bar/nameplate data because it doesn't have the mod.
+  server can't send you chat/boss-bar/nameplate/damage-indicator data because it doesn't have the mod.
 
 MobHealth works as a **server-only**, **client-only**, or **both-sides** install.
 
@@ -164,12 +171,14 @@ file apply as soon as you save; `/mobhealth reload` re-pushes settings to connec
 | `nameplate` | `false` | bool | Put a health bar on the mob's name tag. |
 | `bossBar` | `false` | bool | Show the top-of-screen boss-bar widget. |
 | `graphical` | `true` | bool | Allow modded clients to draw graphical floating bars. |
+| `damageIndicators` | `true` | bool | Send floating damage numbers to modded clients. Requires the mod on the client. |
 
 Each mode's own options are in its matching section below.
 
 #### `[audience]` — who receives the per-viewer displays
 
-Applies to chat, action bar, boss bar, toast, and graphical. (The nameplate is a shared name tag, always visible to everyone nearby.)
+Applies to chat, action bar, boss bar, toast, damage indicators, and graphical. (The nameplate is a
+shared name tag, always visible to everyone nearby.)
 
 | Key | Default | Values | Description |
 |-----|---------|--------|-------------|
@@ -193,6 +202,15 @@ Example `overrides`:
 ```toml
 overrides = ["minecraft:villager=false", "minecraft:ender_dragon=true", "somemod:custom_boss=true"]
 ```
+
+#### `[damageindicators]` — what gets sent
+
+Appearance is entirely client-side; these two decide which hits are worth a packet at all.
+
+| Key | Default | Values | Description |
+|-----|---------|--------|-------------|
+| `minDamage` | `0.0` | `0.0`–`100.0` | Don't send a number for hits below this much damage (health points; 2 = one heart). Raise it to keep poison, thorns and other chip damage off the screen. |
+| `markKillingBlow` | `true` | bool | Flag the blow that kills, which clients draw bold, larger and in their `fatalColor`. |
 
 #### `[chat]`
 
@@ -250,8 +268,9 @@ See [Server-enforced graphical options](#server-enforced-graphical-options-graph
 
 ### Client config (`mobhealth-client.toml`)
 
-These control the appearance of **your own** graphical bars. A server can override any of them (see
-below); when it doesn't, these values apply.
+These control the appearance of **your own** graphical bars and damage numbers. A server can override
+the `[graphical]` ones (see below); when it doesn't, these values apply. The `[damageIndicators]`
+section is yours alone — the server's only say is whether it sends the numbers at all.
 
 `[graphical]`
 
@@ -272,6 +291,26 @@ below); when it doesn't, these values apply.
 | `showPlayers` | `false` | bool | Also draw bars above other players. |
 | `onlyWhenDamaged` | `true` | bool | Only draw a bar once the mob is hurt. |
 | `requireLineOfSight` | `true` | bool | Only draw bars for mobs you can actually see (not through terrain). |
+
+`[damageIndicators]`
+
+| Key | Default | Values | Description |
+|-----|---------|--------|-------------|
+| `enabled` | `true` | bool | Master switch for floating damage numbers on your client. |
+| `scale` | `1.0` | `0.25`–`4.0` | Size multiplier. `1.0` = normal font size. |
+| `durationMs` | `1200` | `200`–`5000` | How long each number lives, in milliseconds. |
+| `drift` | `16.0` | `0.0`–`96.0` | How far the number rises over its life, in screen pixels. |
+| `verticalOffset` | `0.0` | `-2.0`–`4.0` | Extra height (blocks) above the hit. The anchor is upper-body height, so numbers rise through empty air rather than through the health bar. |
+| `spread` | `0.6` | `0.0`–`3.0` | Random scatter (blocks) per number, so a burst of hits reads as several numbers instead of one flickering in place. |
+| `maxDistance` | `32.0` | `4.0`–`96.0` | Only draw numbers within this many blocks of you. |
+| `minDamage` | `0.0` | `0.0`–`100.0` | Ignore hits below this much damage. Filters *further* than the server's own `minDamage`. |
+| `maxOnScreen` | `40` | `4`–`200` | Cap on numbers alive at once; the oldest are dropped first. |
+| `hearts` | `false` | bool | Show damage in hearts rather than raw health points (2 points = 1 heart). |
+| `numberColor` | `FF5555` | `RRGGBB` | Colour of an ordinary damage number. |
+| `fatalColor` | `FFAA00` | `RRGGBB` | Colour of the killing blow. |
+
+> `numberColor` rather than `color` because the in-game config screen looks options up by their last
+> path element alone, and `[bossbar]` already owns `color`.
 
 ### Server-enforced graphical options (`[graphicalEnforce]`)
 
@@ -397,6 +436,26 @@ in `mobhealth-client.toml`, or enforce them server-side in `[graphicalEnforce]`)
     maxDistance = 32.0
 ```
 
+**Damage numbers, nothing else** — the hit is the whole readout; no chat, no bars:
+
+```toml
+[display]
+    chat = false
+    actionBar = false
+    graphical = false
+    damageIndicators = true
+[damageindicators]
+    minDamage = 1.0
+```
+
+```toml
+# mobhealth-client.toml
+[damageIndicators]
+    scale = 1.5
+    hearts = true
+    durationMs = 900
+```
+
 **Immersive graphical-only** — no text clutter, bars only for hurt, visible mobs:
 
 ```toml
@@ -421,11 +480,12 @@ When a **player** damages a living entity, for each hit MobHealth:
 3. Applies **per-entity overrides** (these win over the group toggle).
 4. Picks the **audience** — just the attacker, or everyone nearby — filtered by each player's
    `mobhealth.see` permission and personal mute.
-5. Dispatches to every enabled mode: **chat**, **nameplate**, **boss bar**, and (for modded clients
-   allowed by the server) **graphical**.
+5. Dispatches to every enabled mode: **chat**, **action bar**, **nameplate**, **boss bar**, and (for
+   modded clients allowed by the server) **toast** and **damage indicators**.
 
-The graphical bars additionally read live health from the client and honour the client's config,
-with any server enforcement layered on top.
+Graphical bars are the exception to that list: they are not dispatched per hit at all. The client
+reads live health itself every frame and honours its own config, with any server enforcement layered
+on top — which is why they work on a vanilla server and damage indicators do not.
 
 ---
 

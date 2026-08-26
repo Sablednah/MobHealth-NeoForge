@@ -32,6 +32,9 @@ public class MobHealthClient {
 
         // Graphical bar renderer listens on the game event bus (level render + GUI passes).
         NeoForge.EVENT_BUS.register(GraphicalBarRenderer.class);
+
+        // Floating damage numbers draw in the same GUI pass, fed by a server packet.
+        NeoForge.EVENT_BUS.register(DamageIndicators.class);
     }
 
     @SubscribeEvent

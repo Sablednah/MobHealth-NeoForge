@@ -76,5 +76,16 @@
   "mobhealth.configuration.showText": "Show Numbers",
   "mobhealth.configuration.showPlayers": "Show Above Players",
   "mobhealth.configuration.onlyWhenDamaged": "Only When Damaged",
-  "mobhealth.configuration.requireLineOfSight": "Require Line of Sight"
+  "mobhealth.configuration.requireLineOfSight": "Require Line of Sight",
+  "mobhealth.configuration.damageindicators": "Damage Indicators",
+  "mobhealth.configuration.damageIndicators": "Damage Indicators",
+  "mobhealth.configuration.minDamage": "Minimum Damage",
+  "mobhealth.configuration.markKillingBlow": "Mark Killing Blow",
+  "mobhealth.configuration.durationMs": "Duration (ms)",
+  "mobhealth.configuration.drift": "Rise Distance (px)",
+  "mobhealth.configuration.spread": "Scatter (blocks)",
+  "mobhealth.configuration.maxOnScreen": "Max On Screen",
+  "mobhealth.configuration.hearts": "Show In Hearts",
+  "mobhealth.configuration.numberColor": "Number Colour (RRGGBB)",
+  "mobhealth.configuration.fatalColor": "Killing-Blow Colour (RRGGBB)"
 }

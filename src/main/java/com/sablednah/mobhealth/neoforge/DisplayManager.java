@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.sablednah.mobhealth.MobHealth;
 import com.sablednah.mobhealth.MobHealthConfig;
+import com.sablednah.mobhealth.network.DamageIndicatorPayload;
 import com.sablednah.mobhealth.network.ToastPayload;
 import com.sablednah.mobhealth.core.Audience;
 import com.sablednah.mobhealth.core.MobCategory;
@@ -96,6 +97,9 @@ public final class DisplayManager {
         if (MobHealthConfig.TOAST_ENABLED.get()) {
             sendToast(viewers, victim, event.getSource(), attacker, event.getNewDamage(), current, max);
         }
+        if (MobHealthConfig.DAMAGE_INDICATORS_ALLOWED.get()) {
+            sendDamageIndicator(viewers, victim, event.getNewDamage(), current);
+        }
         if (MobHealthConfig.NAMEPLATE_ENABLED.get()) {
             updateNameplate(victim, current, max, category);
         }
@@ -177,6 +181,27 @@ public final class DisplayManager {
                 .append(BarText.content(current, max, MobHealthConfig.ACTION_BAR_CONTENT.get()));
         for (ServerPlayer viewer : viewers) {
             viewer.displayClientMessage(line, true); // true = action bar (above hotbar)
+        }
+    }
+
+    // =================================================== floating damage numbers
+
+    /**
+     * Send one floating damage number per viewer. The anchor is upper-body height rather than above
+     * the head, so the number rises through empty air instead of straight through the floating
+     * health bar; the client scatters it a little and drifts it upward from there.
+     *
+     * <p>{@code current} is the victim's health AFTER the hit, so zero or less is the killing blow.
+     */
+    private void sendDamageIndicator(List<ServerPlayer> viewers, LivingEntity victim, float damage, double current) {
+        if (damage < MobHealthConfig.INDICATOR_MIN_DAMAGE.get()) {
+            return;
+        }
+        boolean fatal = MobHealthConfig.INDICATOR_MARK_KILL.get() && current <= 0.0D;
+        DamageIndicatorPayload payload = new DamageIndicatorPayload(
+                victim.getX(), victim.getY() + victim.getBbHeight() * 0.6D, victim.getZ(), damage, fatal);
+        for (ServerPlayer viewer : viewers) {
+            PacketDistributor.sendToPlayer(viewer, payload);
         }
     }
 

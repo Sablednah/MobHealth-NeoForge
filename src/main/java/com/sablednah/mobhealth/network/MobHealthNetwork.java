@@ -19,6 +19,8 @@ public final class MobHealthNetwork {
         PayloadRegistrar registrar = event.registrar("1").optional();
         registrar.playToClient(GraphicalGatePayload.TYPE, GraphicalGatePayload.CODEC, MobHealthNetwork::handleOnClient);
         registrar.playToClient(ToastPayload.TYPE, ToastPayload.CODEC, MobHealthNetwork::handleToast);
+        registrar.playToClient(DamageIndicatorPayload.TYPE, DamageIndicatorPayload.CODEC,
+                MobHealthNetwork::handleDamageIndicator);
     }
 
     /**
@@ -29,6 +31,15 @@ public final class MobHealthNetwork {
     private static void handleToast(ToastPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> com.sablednah.mobhealth.client.MobHealthToasts.show(
                 payload.name(), payload.damage(), payload.current(), payload.max(), payload.icon()));
+    }
+
+    /**
+     * Client-only handler for a floating damage number. Same lazy-reference trick as the toast:
+     * {@code DamageIndicators} imports client classes, so it is named only inside the enqueued
+     * lambda and never loaded while a dedicated server registers payloads.
+     */
+    private static void handleDamageIndicator(DamageIndicatorPayload payload, IPayloadContext context) {
+        context.enqueueWork(() -> com.sablednah.mobhealth.client.DamageIndicators.accept(payload));
     }
 
     /**

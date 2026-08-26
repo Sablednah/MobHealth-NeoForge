@@ -34,6 +34,7 @@ public final class MobHealthConfig {
     public static final ModConfigSpec.BooleanValue NAMEPLATE_ENABLED;
     public static final ModConfigSpec.BooleanValue BOSS_BAR_ENABLED;
     public static final ModConfigSpec.BooleanValue GRAPHICAL_ALLOWED;
+    public static final ModConfigSpec.BooleanValue DAMAGE_INDICATORS_ALLOWED;
     public static final ModConfigSpec.EnumValue<Audience> AUDIENCE;
     public static final ModConfigSpec.IntValue NEARBY_RADIUS;
     public static final ModConfigSpec.EnumValue<BarContent> ACTION_BAR_CONTENT;
@@ -59,6 +60,10 @@ public final class MobHealthConfig {
     public static final ModConfigSpec.EnumValue<BarContent> NAMEPLATE_CONTENT;
     public static final ModConfigSpec.EnumValue<ProjectileIcon> TOAST_PROJECTILE_ICON;
     public static final ModConfigSpec.EnumValue<BarContent> CHAT_CONTENT;
+
+    // ------------------------------------------------------------------ damage indicators
+    public static final ModConfigSpec.DoubleValue INDICATOR_MIN_DAMAGE;
+    public static final ModConfigSpec.BooleanValue INDICATOR_MARK_KILL;
 
     // ------------------------------------------------------------------ timing (ticks; 20 = 1s)
     public static final ModConfigSpec.IntValue DISPLAY_TICKS;
@@ -99,6 +104,10 @@ public final class MobHealthConfig {
         NAMEPLATE_ENABLED = BUILDER.comment("Show a health bar on the mob's name tag (works on vanilla clients).").define("nameplate", false);
         BOSS_BAR_ENABLED = BUILDER.comment("Show a boss-bar widget at the top of the screen (works on vanilla clients).").define("bossBar", false);
         GRAPHICAL_ALLOWED = BUILDER.comment("Allow clients that have MobHealth installed to draw graphical floating bars above mobs.").define("graphical", true);
+        DAMAGE_INDICATORS_ALLOWED = BUILDER
+                .comment("Pop a floating red damage number off the mob on each hit. Requires this mod on the client.",
+                        "Options for it live in [damageindicators]; how it LOOKS is each client's own config.")
+                .define("damageIndicators", true);
         BUILDER.pop();
 
         BUILDER.comment("Who receives the per-viewer displays (chat, action bar, boss bar, toast, graphical).",
@@ -156,6 +165,17 @@ public final class MobHealthConfig {
                         "Either way it degrades gracefully (projectile -> weapon -> held item -> heart),",
                         "so modded projectiles (e.g. gun mods) still show something sensible.")
                 .defineEnum("projectileIcon", ProjectileIcon.PROJECTILE);
+        BUILDER.pop();
+
+        BUILDER.comment("Floating damage-number options. Appearance is client-side; these decide what gets SENT.").push("damageindicators");
+        INDICATOR_MIN_DAMAGE = BUILDER
+                .comment("Don't send a number for hits below this much damage (health points; 2 = one heart).",
+                        "Raise it to keep poison, thorns and other chip damage from filling the screen.",
+                        "0 = send every hit. Each client can filter further with its own minDamage.")
+                .defineInRange("minDamage", 0.0D, 0.0D, 100.0D);
+        INDICATOR_MARK_KILL = BUILDER
+                .comment("Flag the killing blow, which clients draw bold, larger and in their fatalColor.")
+                .define("markKillingBlow", true);
         BUILDER.pop();
 
         BUILDER.comment("Appearance of the TEXT bar used by the chat, action bar and nameplate modes.").push("bar");
