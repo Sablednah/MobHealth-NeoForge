@@ -73,7 +73,7 @@ public final class DisplayManager {
 
         double current = victim.getHealth();
         double max = victim.getMaxHealth();
-        if (event.getNewDamage() <= 0.0F) {
+        if (event.getHealthDamage() <= 0.0F) {
             return; // blocked / zero-damage hit carries no useful info
         }
         if (MobHealthConfig.HIDE_UNTIL_DAMAGED.get() && current >= max) {
@@ -89,16 +89,16 @@ public final class DisplayManager {
         List<ServerPlayer> viewers = audienceFor(victim, attacker);
 
         if (MobHealthConfig.CHAT_ENABLED.get()) {
-            sendChat(viewers, victim, event.getNewDamage(), current, max);
+            sendChat(viewers, victim, event.getHealthDamage(), current, max);
         }
         if (MobHealthConfig.ACTION_BAR_ENABLED.get()) {
             sendActionBar(viewers, victim, current, max);
         }
         if (MobHealthConfig.TOAST_ENABLED.get()) {
-            sendToast(viewers, victim, event.getSource(), attacker, event.getNewDamage(), current, max);
+            sendToast(viewers, victim, event.getSource(), attacker, event.getHealthDamage(), current, max);
         }
         if (MobHealthConfig.DAMAGE_INDICATORS_ALLOWED.get()) {
-            sendDamageIndicator(viewers, victim, event.getNewDamage(), current);
+            sendDamageIndicator(viewers, victim, event.getHealthDamage(), current);
         }
         if (MobHealthConfig.NAMEPLATE_ENABLED.get()) {
             updateNameplate(victim, current, max, category);
@@ -168,7 +168,7 @@ public final class DisplayManager {
                 .append(BarText.content(current, max, MobHealthConfig.CHAT_CONTENT.get()))
                 .append(Component.literal(" (-" + trim(damage) + ")").withStyle(ChatFormatting.GRAY));
         for (ServerPlayer viewer : viewers) {
-            viewer.displayClientMessage(line, false);
+            viewer.sendSystemMessage(line);
         }
     }
 
@@ -180,7 +180,7 @@ public final class DisplayManager {
                 .append(Component.literal(" "))
                 .append(BarText.content(current, max, MobHealthConfig.ACTION_BAR_CONTENT.get()));
         for (ServerPlayer viewer : viewers) {
-            viewer.displayClientMessage(line, true); // true = action bar (above hotbar)
+            viewer.sendOverlayMessage(line); // the text line above the hotbar
         }
     }
 
@@ -285,7 +285,8 @@ public final class DisplayManager {
         int id = victim.getId();
         BossEntry entry = bossBars.get(id);
         if (entry == null) {
-            ServerBossEvent event = new ServerBossEvent(cleanName(victim), bossColor(), BossEvent.BossBarOverlay.PROGRESS);
+            ServerBossEvent event = new ServerBossEvent(java.util.UUID.randomUUID(), cleanName(victim), bossColor(),
+                    BossEvent.BossBarOverlay.PROGRESS);
             entry = new BossEntry(event);
             bossBars.put(id, entry);
         }

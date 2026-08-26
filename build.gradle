@@ -9,7 +9,11 @@ tasks.named('wrapper', Wrapper).configure {
     distributionType = Wrapper.DistributionType.BIN
 }
 
-version = mod_version
+// The jar carries the Minecraft version it was built against. All three lines share a mod
+// version, and two files both called mobhealth-2.5.0.jar are indistinguishable in a mods
+// folder or on a releases page. The mod's own version (in neoforge.mods.toml) stays a plain
+// ${mod_version}.
+version = "${mod_version}+mc${minecraft_version}"
 group = mod_group_id
 
 sourceSets.main.resources {
@@ -27,8 +31,9 @@ base {
     archivesName = mod_id
 }
 
-// Mojang ships Java 21 to end users, so mods should target Java 21.
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+// 26.1 ships the java-runtime-epsilon JRE to players, so Java 25 is what everyone has.
+// Targeting 21 here would target a runtime nobody runs.
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 
 neoForge {
     version = project.neo_version

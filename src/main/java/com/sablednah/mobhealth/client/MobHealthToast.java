@@ -1,7 +1,7 @@
 package com.sablednah.mobhealth.client;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.ToastManager;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -78,18 +78,18 @@ public class MobHealthToast implements Toast {
     }
 
     @Override
-    public void render(GuiGraphics graphics, Font font, long time) {
+    public void extractRenderState(GuiGraphicsExtractor graphics, Font font, long time) {
         graphics.blitSprite(RenderPipelines.GUI_TEXTURED, BACKGROUND, 0, 0, width(), height());
         if (icon != null && !icon.isEmpty()) {
-            graphics.renderItem(icon, 8, 8); // the weapon/arrow that dealt the damage
+            graphics.item(icon, 8, 8); // the weapon/arrow that dealt the damage
         } else {
             drawHeart(graphics, 8, 10, 2); // fallback
         }
-        graphics.drawString(font, title, 30, 7, 0xFFFFFF00, false);
-        graphics.drawString(font, message, 30, 18, 0xFFFFFFFF, false);
+        graphics.text(font, title, 30, 7, 0xFFFFFF00, false);
+        graphics.text(font, message, 30, 18, 0xFFFFFFFF, false);
     }
 
-    private static void drawHeart(GuiGraphics graphics, int ox, int oy, int scale) {
+    private static void drawHeart(GuiGraphicsExtractor graphics, int ox, int oy, int scale) {
         for (int row = 0; row < HEART.length; row++) {
             for (int col = 0; col < HEART[row].length; col++) {
                 if (HEART[row][col] == 1) {

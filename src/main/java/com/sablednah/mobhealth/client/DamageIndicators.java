@@ -5,7 +5,6 @@ import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.joml.Matrix4f;
-import org.joml.Quaternionf;
 import org.joml.Vector4f;
 
 import com.sablednah.mobhealth.network.DamageIndicatorPayload;
@@ -13,7 +12,7 @@ import com.sablednah.mobhealth.network.DamageIndicatorPayload;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
@@ -95,11 +94,17 @@ public final class DamageIndicators {
 
         Camera camera = mc.gameRenderer.getMainCamera();
         Vec3 camPos = camera.position();
-        Quaternionf viewRotation = camera.rotation().conjugate(new Quaternionf());
-        Matrix4f projView = mc.gameRenderer.getProjectionMatrix(mc.options.fov().get())
-                .mul(new Matrix4f().rotation(viewRotation), new Matrix4f());
+        // 26.1 dropped GameRenderer.getProjectionMatrix(fov) and moved the combined
+        // view-rotation-and-projection matrix onto the Camera, which is what vanilla's own
+        // projectPointToScreen uses. Building it by hand from the fov option is no longer
+        // possible, and no longer necessary.
+        //
+        // Deliberately NOT switching to projectPointToScreen itself: it returns projected
+        // coordinates with no way to tell that a point was behind the camera, and the
+        // w <= 0.05 test below is what stops things behind you being drawn mirrored.
+        Matrix4f projView = camera.getViewRotationProjectionMatrix(new Matrix4f());
 
-        GuiGraphics graphics = event.getGuiGraphics();
+        GuiGraphicsExtractor graphics = event.getGuiGraphics();
         Font font = mc.font;
         int screenW = graphics.guiWidth();
         int screenH = graphics.guiHeight();
@@ -147,7 +152,7 @@ public final class DamageIndicators {
             graphics.pose().pushMatrix();
             graphics.pose().translate(sx, sy);
             graphics.pose().scale(scale, scale);
-            graphics.drawString(font, text, -font.width(text) / 2, -4, argb);
+            graphics.text(font, text, -font.width(text) / 2, -4, argb);
             graphics.pose().popMatrix();
         }
     }

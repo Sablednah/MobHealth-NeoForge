@@ -9,9 +9,9 @@ graphical floating bars.
 
 | | |
 |---|---|
-| **Minecraft** | 1.21.11 |
-| **Loader** | NeoForge 21.11.42 |
-| **Java** | 21 |
+| **Minecraft** | 26.1.2 |
+| **Loader** | NeoForge 26.1.2.95 |
+| **Java** | 25 |
 | **License** | MIT |
 
 ---

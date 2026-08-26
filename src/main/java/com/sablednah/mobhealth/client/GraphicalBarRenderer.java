@@ -1,7 +1,6 @@
 package com.sablednah.mobhealth.client;
 
 import org.joml.Matrix4f;
-import org.joml.Quaternionf;
 import org.joml.Vector4f;
 
 import com.sablednah.mobhealth.core.BarStyle;
@@ -12,7 +11,7 @@ import com.sablednah.mobhealth.network.GraphicalPolicy;
 
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -32,7 +31,7 @@ import net.neoforged.neoforge.client.event.RenderGuiEvent;
  * Instead we do everything once per frame in the GUI pass: rebuild the exact view matrix Minecraft
  * uses ({@code new Matrix4f().rotation(camera.rotation().conjugate())}, see GameRenderer), combine
  * it with the projection, and project each nearby living entity to the screen — then draw a pixel
- * bar with {@link GuiGraphics#fill}. Pixel bars are constant width and immune to the proportional
+ * bar with {@link GuiGraphicsExtractor#fill}. Pixel bars are constant width and immune to the proportional
  * font issue that affects text bars.
  */
 public final class GraphicalBarRenderer {
@@ -63,13 +62,19 @@ public final class GraphicalBarRenderer {
         // Reproduce Minecraft's world view matrix exactly (GameRenderer), then combine with the
         // projection. Computed here (once per frame) rather than captured from the multi-pass level
         // render, so it is stable and correct.
-        Quaternionf viewRotation = camera.rotation().conjugate(new Quaternionf());
-        Matrix4f projView = mc.gameRenderer.getProjectionMatrix(mc.options.fov().get())
-                .mul(new Matrix4f().rotation(viewRotation), new Matrix4f());
+        // 26.1 dropped GameRenderer.getProjectionMatrix(fov) and moved the combined
+        // view-rotation-and-projection matrix onto the Camera, which is what vanilla's own
+        // projectPointToScreen uses. Building it by hand from the fov option is no longer
+        // possible, and no longer necessary.
+        //
+        // Deliberately NOT switching to projectPointToScreen itself: it returns projected
+        // coordinates with no way to tell that a point was behind the camera, and the
+        // w <= 0.05 test below is what stops things behind you being drawn mirrored.
+        Matrix4f projView = camera.getViewRotationProjectionMatrix(new Matrix4f());
 
         float partialTick = mc.getDeltaTracker().getGameTimeDeltaPartialTick(false);
 
-        GuiGraphics graphics = event.getGuiGraphics();
+        GuiGraphicsExtractor graphics = event.getGuiGraphics();
         int screenW = graphics.guiWidth();
         int screenH = graphics.guiHeight();
 
@@ -163,7 +168,7 @@ public final class GraphicalBarRenderer {
         }
     }
 
-    private static void drawBar(GuiGraphics graphics, Minecraft mc, int cx, int cy, float health, float max,
+    private static void drawBar(GuiGraphicsExtractor graphics, Minecraft mc, int cx, int cy, float health, float max,
                                 int width, int height, boolean showBackground, boolean showText, float alpha,
                                 BarStyle style, int segments) {
         int left = cx - width / 2;
@@ -183,11 +188,11 @@ public final class GraphicalBarRenderer {
         if (showText) {
             String text = HealthBarFormatter.value(health, max, ValueStyle.CURRENT_MAX);
             int textX = cx - mc.font.width(text) / 2;
-            graphics.drawString(mc.font, text, textX, top - 10, withAlpha(0xFFFFFFFF, alpha));
+            graphics.text(mc.font, text, textX, top - 10, withAlpha(0xFFFFFFFF, alpha));
         }
     }
 
-    private static void drawSolid(GuiGraphics g, int left, int top, int w, int h, float frac,
+    private static void drawSolid(GuiGraphicsExtractor g, int left, int top, int w, int h, float frac,
                                   boolean bg, int bgColor, int track, int fill) {
         if (bg) {
             g.fill(left - 1, top - 1, left + w + 1, top + h + 1, bgColor);
@@ -199,7 +204,7 @@ public final class GraphicalBarRenderer {
         }
     }
 
-    private static void drawSegmented(GuiGraphics g, int left, int top, int w, int h, float frac,
+    private static void drawSegmented(GuiGraphicsExtractor g, int left, int top, int w, int h, float frac,
                                       boolean bg, int bgColor, int track, int fill, int segments) {
         int segs = Math.max(2, segments);
         if (bg) {
@@ -215,7 +220,7 @@ public final class GraphicalBarRenderer {
         }
     }
 
-    private static void drawTapered(GuiGraphics g, int left, int top, int w, int h, float frac,
+    private static void drawTapered(GuiGraphicsExtractor g, int left, int top, int w, int h, float frac,
                                     boolean bg, int bgColor, int track, int fill) {
         int fw = Math.round(w * frac);
         float halfW = w / 2.0F;
@@ -231,7 +236,7 @@ public final class GraphicalBarRenderer {
         }
     }
 
-    private static void drawRounded(GuiGraphics g, int left, int top, int w, int h, float frac,
+    private static void drawRounded(GuiGraphicsExtractor g, int left, int top, int w, int h, float frac,
                                     boolean bg, int bgColor, int track, int fill) {
         int r = Math.min(2, Math.min(w, h) / 2);
         if (bg) {
@@ -245,7 +250,7 @@ public final class GraphicalBarRenderer {
     }
 
     /** Filled rectangle with all four corners clipped by {@code r} (rounded look). */
-    private static void fillRounded(GuiGraphics g, int x, int y, int w, int h, int r, int color) {
+    private static void fillRounded(GuiGraphicsExtractor g, int x, int y, int w, int h, int r, int color) {
         if (r <= 0) {
             g.fill(x, y, x + w, y + h, color);
             return;
@@ -256,7 +261,7 @@ public final class GraphicalBarRenderer {
     }
 
     /** Filled rectangle with only the LEFT corners rounded; right edge is a straight cut. */
-    private static void fillRoundedLeft(GuiGraphics g, int x, int y, int w, int h, int r, int color) {
+    private static void fillRoundedLeft(GuiGraphicsExtractor g, int x, int y, int w, int h, int r, int color) {
         if (r <= 0 || w <= r) {
             g.fill(x, y, x + w, y + h, color);
             return;
