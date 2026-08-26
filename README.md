@@ -1,4 +1,4 @@
-<p align="center"><img src="docs/banner.png" alt="MobHealth — Simple Damage Reporting" width="400"></p>
+<p align="center"><img src="docs/banner-reforged.png" alt="MobHealth — Simple Damage Reporting" width="400"></p>
 
 # MobHealth (NeoForge)
 
@@ -527,6 +527,19 @@ Run `./gradlew runClient` or `./gradlew runServer` for a dev instance.
 `./deploy.sh` builds and drops the jar into a CurseForge test instance, picking the JDK and the
 instance from the branch's `minecraft_version`. Override the target with
 `MOBHEALTH_INSTANCE="/path/to/instance" ./deploy.sh`.
+
+### Branding
+
+| File | What it is |
+|------|------------|
+| `docs/icon.png` | 1254² master for the mods-list icon. What ships is this area-averaged down to 256 (`src/main/resources/mobhealth-icon.png`) — regenerate from here if another size is ever wanted. |
+| `docs/banner-reforged.png` | 640×128 banner. Ships as-is (`src/main/resources/mobhealth-banner.png`) and heads this file. |
+| `docs/banner.png` | The original 320×64 banner. Superseded here, but still what the version branches' READMEs point at — documentation lives on `main`, so they were not re-pointed at an image they do not carry. |
+| `docs/reforged.png` | The bare ReForged plate, 1024². A source element rather than a mod icon: it carries no MobHealth identity of its own, so nothing ships it. |
+
+`neoforge.mods.toml` declares `iconFile`, `bannerFile` and `logoFile`. 26.2 uses the first two — a
+small square beside the name in the list, and a wide image in the info panel — and older loaders
+ignore both and read the third.
 
 The core logic (`com.sablednah.mobhealth.core`) has no Minecraft imports, keeping the health/bar
 formatting and decision types portable for a possible future port to another loader.
