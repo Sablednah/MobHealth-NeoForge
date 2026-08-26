@@ -18,7 +18,7 @@ public final class MobHealthToasts {
         if (mc == null) {
             return;
         }
-        ToastManager manager = mc.getToastManager();
+        ToastManager manager = mc.gui.toastManager();
         Component title = Component.literal(name);
         Component message = Component.literal(trim(current) + "/" + trim(max) + "  (-" + trim(damage) + ")");
 

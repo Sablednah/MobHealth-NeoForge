@@ -79,7 +79,7 @@ public final class DamageIndicators {
             return;
         }
         Minecraft mc = Minecraft.getInstance();
-        if (mc.level == null || mc.player == null || mc.options.hideGui) {
+        if (mc.level == null || mc.player == null || mc.gui.hud.isHidden()) {
             return;
         }
 
@@ -92,7 +92,7 @@ public final class DamageIndicators {
         int color = MobHealthClientConfig.indicatorColor();
         int fatalColor = MobHealthClientConfig.indicatorFatalColor();
 
-        Camera camera = mc.gameRenderer.getMainCamera();
+        Camera camera = mc.gameRenderer.mainCamera();
         Vec3 camPos = camera.position();
         // 26.1 dropped GameRenderer.getProjectionMatrix(fov) and moved the combined
         // view-rotation-and-projection matrix onto the Camera, which is what vanilla's own

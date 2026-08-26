@@ -52,11 +52,11 @@ public final class GraphicalBarRenderer {
             return;
         }
         Minecraft mc = Minecraft.getInstance();
-        if (mc.level == null || mc.player == null || mc.options.hideGui) {
+        if (mc.level == null || mc.player == null || mc.gui.hud.isHidden()) {
             return;
         }
 
-        Camera camera = mc.gameRenderer.getMainCamera();
+        Camera camera = mc.gameRenderer.mainCamera();
         Vec3 camPos = camera.position();
 
         // Reproduce Minecraft's world view matrix exactly (GameRenderer), then combine with the
