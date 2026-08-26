@@ -7,8 +7,8 @@
 #          MOBHEALTH_INSTANCE="/path/to/instance" ./deploy.sh
 #
 # One instance per Minecraft line, so the branch you are on decides where the jar goes.
-# The default instance name carries the Minecraft version for every line except 1.21.11,
-# whose instance predates the others and keeps its original name.
+# The calendar-versioned instances are named for their Minecraft version alone and are shared
+# with the other mods in this family; the 1.21.11 one predates them and keeps its own name.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
@@ -39,7 +39,7 @@ export PATH="$JAVA_HOME/bin:$PATH"
 
 case "$MC_VERSION" in
     1.21.11) DEFAULT_INSTANCE="MobHealth - Forge" ;;
-    *)       DEFAULT_INSTANCE="MobHealth - $MC_VERSION" ;;
+    *)       DEFAULT_INSTANCE="$MC_VERSION" ;;
 esac
 INSTANCE="${MOBHEALTH_INSTANCE:-/mnt/c/Users/darre/curseforge/minecraft/Instances/$DEFAULT_INSTANCE}"
 MODS="$INSTANCE/mods"
