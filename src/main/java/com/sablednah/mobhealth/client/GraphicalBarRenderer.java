@@ -26,13 +26,11 @@ import net.neoforged.neoforge.client.event.RenderGuiEvent;
 /**
  * Draws graphical floating health bars above mobs (client-side).
  *
- * <p>The 1.21.11 render pipeline renders the world several times per frame and no longer exposes a
- * readable projection matrix, so capturing matrices from the level render produced period-N jitter.
- * Instead we do everything once per frame in the GUI pass: rebuild the exact view matrix Minecraft
- * uses ({@code new Matrix4f().rotation(camera.rotation().conjugate())}, see GameRenderer), combine
- * it with the projection, and project each nearby living entity to the screen — then draw a pixel
- * bar with {@link GuiGraphicsExtractor#fill}. Pixel bars are constant width and immune to the proportional
- * font issue that affects text bars.
+ * <p>The render pipeline draws the world several times per frame, so capturing matrices from the
+ * level render produced period-N jitter. Instead we do everything once per frame in the GUI pass:
+ * take the camera's combined view-rotation-and-projection matrix, project each nearby living
+ * entity to the screen, and draw a pixel bar with {@link GuiGraphicsExtractor#fill}. Pixel bars are
+ * constant width and immune to the proportional font issue that affects text bars.
  */
 public final class GraphicalBarRenderer {
 
@@ -59,13 +57,12 @@ public final class GraphicalBarRenderer {
         Camera camera = mc.gameRenderer.mainCamera();
         Vec3 camPos = camera.position();
 
-        // Reproduce Minecraft's world view matrix exactly (GameRenderer), then combine with the
-        // projection. Computed here (once per frame) rather than captured from the multi-pass level
-        // render, so it is stable and correct.
-        // 26.1 dropped GameRenderer.getProjectionMatrix(fov) and moved the combined
-        // view-rotation-and-projection matrix onto the Camera, which is what vanilla's own
-        // projectPointToScreen uses. Building it by hand from the fov option is no longer
-        // possible, and no longer necessary.
+        // Minecraft's own combined view-rotation-and-projection matrix, read once per frame here
+        // rather than captured from the multi-pass level render, so it is stable and correct.
+        //
+        // 26.1 dropped GameRenderer.getProjectionMatrix(fov) and moved this matrix onto the
+        // Camera, which is what vanilla's own projectPointToScreen uses. Building it by hand from
+        // the fov option is no longer possible, and no longer necessary.
         //
         // Deliberately NOT switching to projectPointToScreen itself: it returns projected
         // coordinates with no way to tell that a point was behind the camera, and the
