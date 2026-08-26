@@ -30,6 +30,7 @@ graphical floating bars.
 - [How MobHealth decides what to show](#how-mobhealth-decides-what-to-show)
 - [Minecraft versions](#minecraft-versions)
 - [Building from source](#building-from-source)
+  - [Releasing](#releasing)
 - [License](#license)
 
 ---
@@ -527,6 +528,37 @@ Run `./gradlew runClient` or `./gradlew runServer` for a dev instance.
 `./deploy.sh` builds and drops the jar into a CurseForge test instance, picking the JDK and the
 instance from the branch's `minecraft_version`. Override the target with
 `MOBHEALTH_INSTANCE="/path/to/instance" ./deploy.sh`.
+
+### Releasing
+
+Publishing a GitHub release publishes to CurseForge too, via
+[`.github/workflows/curseforge.yml`](.github/workflows/curseforge.yml). It downloads every jar
+attached to the release, reads the Minecraft version out of each filename
+(`mobhealth-2.5.0+mc26.2.jar` → `26.2`), and uploads them with the release body as the changelog.
+
+**One-time setup (owner only — the token must never be pasted into a chat or committed):**
+
+1. Create a token at <https://legacy.curseforge.com/account/api-tokens>.
+2. Repo **Settings → Secrets and variables → Actions → Secrets**: add `CURSEFORGE_TOKEN`.
+3. Same screen, **Variables** tab: add `CURSEFORGE_PROJECT_ID` — the numeric project ID from the
+   CurseForge project page.
+
+Until both exist the workflow **skips rather than fails**, so it will not put a red cross on a
+release. Once they exist, `workflow_dispatch` uploads an already-published tag by hand — which is
+how a release published before the secrets were set gets its jars to CurseForge. That run also takes
+a `release_type` (release / beta / alpha) and an `only` filter, so a subset of the jars can go up at
+a different release type from the rest.
+
+`scripts/curseforge-upload.sh` does the actual upload and runs locally too. CurseForge wants numeric
+game-version IDs and renumbers them as versions are added, so it resolves them from the API every
+run and fails with the list of names CurseForge *does* know when a Minecraft version is missing.
+**That is the expected failure for a few days after any Minecraft release** — CurseForge has to add
+the version before anything can be uploaded against it.
+
+⚠ **HTTP 200 means accepted, not published.** CurseForge dedupes by file content, so re-uploading a
+release that is already up gets each file rejected as a duplicate — and rejected files are hidden
+from the author file list by default, so it looks like nothing arrived at all. The authoritative
+view is `authors.curseforge.com/#/projects/<id>/files`.
 
 ### Branding
 
