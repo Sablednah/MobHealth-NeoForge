@@ -28,6 +28,7 @@ graphical floating bars.
   - [Server-enforced graphical options](#server-enforced-graphical-options-graphicalenforce)
 - [Recipes](#recipes-common-setups)
 - [How MobHealth decides what to show](#how-mobhealth-decides-what-to-show)
+- [Minecraft versions](#minecraft-versions)
 - [Building from source](#building-from-source)
 - [License](#license)
 
@@ -489,17 +490,43 @@ on top — which is why they work on a vanilla server and damage indicators do n
 
 ---
 
+## Minecraft versions
+
+MobHealth is built for three Minecraft lines, one per branch. All three carry the same mod version
+and the same features; only the branch differs.
+
+| Branch | Minecraft | NeoForge | Java | Jar |
+|--------|-----------|----------|------|-----|
+| `main` | 1.21.11 | 21.11.42 | 21 | `mobhealth-<version>+mc1.21.11.jar` |
+| `mc26.1` | 26.1.2 | 26.1.2.95 | 25 | `mobhealth-<version>+mc26.1.2.jar` |
+| `mc26.2` | 26.2 | 26.2.0.59 | 25 | `mobhealth-<version>+mc26.2.jar` |
+
+Every jar carries the Minecraft version it was built against, because three files all called
+`mobhealth-<version>.jar` are indistinguishable in a mods folder. The version *inside* the jar's
+`neoforge.mods.toml` is a plain `<version>` on all three.
+
+Minecraft is on quarterly calendar versioning now, so this is a treadmill rather than a port that
+finishes. What each drop actually cost, and why the answer changes the plan, is written down in
+[`docs/VERSIONS.md`](docs/VERSIONS.md).
+
+---
+
 ## Building from source
 
-Requires a JDK 21.
+Requires JDK 21 on `main`, JDK 25 on the 26.x branches — the JDK tracks Minecraft, because 26.1
+ships the `java-runtime-epsilon` runtime to players.
 
 ```bash
 ./gradlew build
-# output: build/libs/mobhealth-<version>.jar
+# output: build/libs/mobhealth-<version>+mc<minecraft version>.jar
 ```
 
 The project is a standard [NeoForge ModDevGradle](https://github.com/neoforged/ModDevGradle) setup.
 Run `./gradlew runClient` or `./gradlew runServer` for a dev instance.
+
+`./deploy.sh` builds and drops the jar into a CurseForge test instance, picking the JDK and the
+instance from the branch's `minecraft_version`. Override the target with
+`MOBHEALTH_INSTANCE="/path/to/instance" ./deploy.sh`.
 
 The core logic (`com.sablednah.mobhealth.core`) has no Minecraft imports, keeping the health/bar
 formatting and decision types portable for a possible future port to another loader.
