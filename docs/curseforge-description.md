@@ -2,13 +2,13 @@
 
 **This simple but invaluable mod lets you know the damage you just caused to a mob (including other players), and how much health it has left.**
 
-MobHealth is a modern NeoForge rewrite of the classic MobHealth Bukkit plugin — the same idea it had in 2011, rebuilt for Minecraft 1.21.11 with six display modes you can mix and match.
+MobHealth is a modern NeoForge rewrite of the classic MobHealth Bukkit plugin — the same idea it had in 2011, rebuilt for Minecraft 1.21.11, 26.1 and 26.2 with seven display modes you can mix and match.
 
 Hit a zombie, and MobHealth tells you exactly what you did to it:
 
 `Zombie [||||||||||] 14/20 (-6)`
 
-Or shows you a floating health bar above its head. Or a boss bar. Or a name-tag bar. Your call — every mode is independent, and you can enable as many as you like.
+Or shows you a floating health bar above its head. Or a boss bar. Or a name-tag bar. Or throws a red **-6** into the air where you hit it. Your call — every mode is independent, and you can enable as many as you like.
 
 ---
 
@@ -59,12 +59,31 @@ Or shows you a floating health bar above its head. Or a boss bar. Or a name-tag 
 | **Boss bar** | The vanilla boss-bar widget at the top of the screen | No |
 | **Toast** | An achievement-style popup showing the mob, the weapon used, and its health | Yes |
 | **Graphical** | A crisp pixel health bar floating above the mob in the world | Yes |
+| **Damage indicators** | Red numbers that pop off the mob for each hit, rise and fade | Yes |
 
 Bars are coloured by remaining health — green, to yellow, to red.
 
-**The first four modes work on completely unmodified vanilla clients.** Install MobHealth on your server and every player gets chat, action bar, nameplate and boss-bar health readouts without downloading anything. Players who *also* install the mod additionally get toasts and graphical bars.
+### New in 2.5.0 — damage indicators
 
-MobHealth runs happily as a **server-only**, **client-only**, or **both-sides** install. Client-only on a vanilla server? You still get graphical bars over everything you can see.
+Every other mode reports the mob's **state**. Damage indicators report the **hit**: each blow throws a
+red number into the world where it landed, which drifts upward and fades over about a second. The
+killing blow is drawn bold, larger and amber, so you can see the one that finished the job.
+
+They follow exactly the same rules as everything else — target groups, per-entity overrides,
+audience, permissions and your personal `/mobhealth toggle`. Your client controls how they look:
+size, how long they live, how far they rise, how much they scatter, draw distance, a minimum damage
+threshold, and both colours. You can also read damage in **hearts** instead of health points.
+
+Servers get two settings of their own: a `minDamage` floor, so poison and thorns don't fill the
+screen, and whether to flag the killing blow at all.
+
+*Damage indicators need MobHealth on **both** sides.* The number genuinely only exists on the
+server — a client can see health drop, but a drop is not a hit, and absorption, regeneration and
+healing all move the same number.
+
+**The first four modes work on completely unmodified vanilla clients.** Install MobHealth on your server and every player gets chat, action bar, nameplate and boss-bar health readouts without downloading anything. Players who *also* install the mod additionally get toasts, graphical bars and damage indicators.
+
+MobHealth runs happily as a **server-only**, **client-only**, or **both-sides** install. Client-only on a vanilla server? You still get graphical bars over everything you can see — those are drawn from health the client can already read. Damage indicators are the one mode that needs both sides.
 
 ---
 
@@ -122,10 +141,18 @@ Changes apply as soon as you save. The full config reference, plus ready-made re
 
 ## Requirements
 
-- Minecraft **1.21.11**
-- **NeoForge** 21.11.42+
-- Java 21
-- No other dependencies.
+Pick the file matching your Minecraft version — each jar's name carries it.
+
+| Minecraft | NeoForge | Java | File |
+|-----------|----------|------|------|
+| 1.21.11 | 21.11.42+ | 21 | `mobhealth-<version>+mc1.21.11.jar` |
+| 26.1.2 | 26.1.2.95+ | 25 | `mobhealth-<version>+mc26.1.2.jar` |
+| 26.2 | 26.2.0.59+ | 25 | `mobhealth-<version>+mc26.2.jar` |
+
+The Java version tracks Minecraft, not MobHealth — 26.1 ships its own Java 25 runtime, so the
+launcher handles it for you.
+
+No other dependencies.
 
 ---
 
