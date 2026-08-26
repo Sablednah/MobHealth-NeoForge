@@ -13,8 +13,23 @@ description='''
 ${mod_description}
 '''
 displayURL="https://github.com/Sablednah/MobHealth-NeoForge"
-logoFile="mobhealth.png"
-logoBlur=false
+# The mod list changed shape in 26.2, so the artwork is declared three ways and older
+# loaders simply ignore the two keys they do not know:
+#   iconFile   - the small SQUARE beside the name in the list (26.2+). Without one, our row
+#                is the only one in the list with no icon at all.
+#   bannerFile - the wide image in the info panel (26.2+), drawn at its own aspect ratio.
+#   logoFile   - what 1.21.x and 26.1 show in the info panel, and what 26.2 falls back to
+#                when bannerFile is absent. Pointed at the banner so the older versions get
+#                the name and the tagline rather than a bare heart.
+iconFile="mobhealth-icon.png"
+bannerFile="mobhealth-banner.png"
+logoFile="mobhealth-banner.png"
+# Smoothed, unlike the 64px heart this replaces. That was seven colours with hard alpha and
+# point sampling was right for it; both of these are antialiased artwork (27,327 and 4,375
+# distinct colours, and the banner has 1,604 partially transparent pixels), so they are
+# scaled rather than snapped.
+logoBlur=true
+iconBlur=true
 
 # Client rendering is done via a client-only entrypoint; the mod also works fully
 # server-side (nameplate bars, boss bars, chat) with vanilla clients.
