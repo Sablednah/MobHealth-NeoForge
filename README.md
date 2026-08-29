@@ -298,7 +298,7 @@ section is yours alone — the server's only say is whether it sends the numbers
 | Key | Default | Values | Description |
 |-----|---------|--------|-------------|
 | `enabled` | `true` | bool | Master switch for floating damage numbers on your client. |
-| `scale` | `1.0` | `0.25`–`4.0` | Size multiplier. `1.0` = normal font size. |
+| `scale` | `2.0` | `0.25`–`4.0` | Size multiplier. `1.0` = normal font size. |
 | `durationMs` | `1200` | `200`–`5000` | How long each number lives, in milliseconds. |
 | `drift` | `16.0` | `0.0`–`96.0` | How far the number rises over its life, in screen pixels. |
 | `verticalOffset` | `0.0` | `-2.0`–`4.0` | Extra height (blocks) above the hit. The anchor is upper-body height, so numbers rise through empty air rather than through the health bar. |
