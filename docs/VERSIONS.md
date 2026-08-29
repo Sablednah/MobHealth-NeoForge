@@ -161,7 +161,10 @@ The failures that would not show up in a build, roughly in order of how likely t
   `main` and crossed both versions inside the port commits, which is why the port cost one pass
   rather than three.
 - **Retarget by editing `gradle.properties`** (`minecraft_version`, `minecraft_version_range`,
-  `neo_version`), plus the JDK in `build.gradle` and ModDevGradle's version in the plugins block.
+  `neo_version`, `neo_version_range`), plus the JDK in `build.gradle` and ModDevGradle's version in
+  the plugins block. The two `_range` values are the mod's *load* constraints and are deliberately
+  wider than the build: the line, not the build of it, so a NeoForge or Minecraft bugfix drop does
+  not strand the jar.
 - **`./deploy.sh` reads the branch's `minecraft_version`** and picks both the JDK and the CurseForge
   instance from it, so the same command does the right thing on every branch. It names the expected
   jar exactly rather than taking the newest in `build/libs`, because that directory keeps whatever
