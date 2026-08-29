@@ -76,7 +76,7 @@ public final class MobHealthClientConfig {
                 "everything here is how THIS client draws the ones it receives.").push("damageIndicators");
         INDICATORS_ENABLED = BUILDER.comment("Master switch for floating damage numbers.").define("enabled", true);
         INDICATOR_SCALE = BUILDER.comment("Size multiplier for the number. 1.0 = normal font size.")
-                .defineInRange("scale", 1.0D, 0.25D, 4.0D);
+                .defineInRange("scale", 2.0D, 0.25D, 4.0D);
         INDICATOR_DURATION_MS = BUILDER.comment("How long each number lives, in milliseconds.")
                 .defineInRange("durationMs", 1200, 200, 5000);
         INDICATOR_DRIFT = BUILDER.comment("How far the number rises over its life, in screen pixels.")
