@@ -49,7 +49,11 @@ public final class MobHealthCommands {
         MobHealthNetwork.sync(player); // muting also hides the client's graphical bars
 
         Component message = muted
-                ? Component.literal("MobHealth displays hidden for you (chat & boss bar). "
+                // No list of modes here: it went stale the moment toast, the action bar and damage
+                // indicators arrived. The nameplate is the only part worth naming, because it is the
+                // one thing this command cannot hide -- a name tag is a single shared entity
+                // property, so there is no per-viewer copy of it to switch off.
+                ? Component.literal("MobHealth displays hidden for you. "
                         + "Note: nameplates are shared and stay visible.")
                 : Component.literal("MobHealth displays shown for you.");
         ctx.getSource().sendSuccess(() -> message, false);
