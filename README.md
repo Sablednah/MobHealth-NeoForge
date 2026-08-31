@@ -98,7 +98,7 @@ a drop in health is not the same thing as a hit (absorption, regeneration and he
 
 > **Note on the nameplate:** a name tag is a single shared property on the mob, so *everyone* nearby
 > sees the same one. The per-player `audience`, the personal mute (`/mobhealth toggle`), and the
-> `mobhealth.see` permission therefore apply to **chat, boss bar, and graphical** bars — they cannot
+> `mobhealth.see` permission therefore apply to **every mode except the nameplate** — they cannot
 > hide a nameplate from an individual player.
 
 ---
@@ -124,7 +124,7 @@ MobHealth works as a **server-only**, **client-only**, or **both-sides** install
 | `/mobhealth reload` | Ops (permission level 2+) | Re-pushes settings (including graphical enforcement) to online players. Config edits also auto-apply when the file is saved, so this is rarely needed. |
 | `/mobhealth toggle` | Everyone | Toggles **your own** displays on/off. Your choice is saved and persists across logouts and deaths. |
 | `/mobhealth toggle on` | Everyone | Turns your displays on. |
-| `/mobhealth toggle off` | Everyone | Turns your displays off (hides chat, boss bar, and graphical bars for you). |
+| `/mobhealth toggle off` | Everyone | Turns your displays off (hides every mode for you except nameplates, which are shared). |
 
 ---
 
@@ -137,7 +137,7 @@ per-group with no extra setup.
 
 | Node / gate | Default | Controls |
 |-------------|---------|----------|
-| `mobhealth.see` | everyone | Whether a player **receives** displays at all (chat, boss bar, graphical). Deny it to hide MobHealth from a rank. |
+| `mobhealth.see` | everyone | Whether a player **receives** displays — every mode except the nameplate, which is shared and cannot be hidden per player. Deny it to hide MobHealth from a rank. |
 | `/mobhealth reload` | op level 2 | Access to the reload command. |
 | `/mobhealth toggle` | everyone | Access to the personal toggle. |
 
@@ -146,6 +146,10 @@ Example with LuckPerms — hide MobHealth from the `guest` group:
 ```
 /lp group guest permission set mobhealth.see false
 ```
+
+**[`docs/NODES.md`](docs/NODES.md) is the full reference** — every node, exactly which modes it
+covers, why the commands are op-gated rather than node-gated, and when a permission change actually
+reaches a player's graphical bars.
 
 ---
 
