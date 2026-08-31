@@ -531,23 +531,27 @@ instance from the branch's `minecraft_version`. Override the target with
 
 ### Releasing
 
-Publishing a GitHub release publishes to CurseForge too, via
-[`.github/workflows/curseforge.yml`](.github/workflows/curseforge.yml). It downloads every jar
-attached to the release, reads the Minecraft version out of each filename
-(`mobhealth-2.5.0+mc26.2.jar` → `26.2`), and uploads them with the release body as the changelog.
+Publishing a GitHub release publishes to **CurseForge and Modrinth** too, via
+[`.github/workflows/curseforge.yml`](.github/workflows/curseforge.yml) and
+[`.github/workflows/modrinth.yml`](.github/workflows/modrinth.yml). Both have the same shape: they
+download every jar attached to the release, read the Minecraft version out of each filename
+(`mobhealth-2.5.1+mc26.2.jar` → `26.2`), and upload them with the release body as the changelog. So
+one release carries all three lines to both sites, provided all three jars are attached to it.
 
-**One-time setup (owner only — the token must never be pasted into a chat or committed):**
+Both **skip rather than fail** until their secret is set, so neither puts a red cross on a release.
+Once set, `workflow_dispatch` uploads an already-published tag by hand — which is how a release
+published before the secrets existed gets its jars up. That run also takes a `release_type`
+(release / beta / alpha) and an `only` filter, so a subset of the jars can go up at a different
+release type from the rest.
+
+**One-time setup (owner only — a token must never be pasted into a chat or committed):**
+
+#### CurseForge
 
 1. Create a token at <https://legacy.curseforge.com/account/api-tokens>.
 2. Repo **Settings → Secrets and variables → Actions → Secrets**: add `CURSEFORGE_TOKEN`.
 3. Same screen, **Variables** tab: add `CURSEFORGE_PROJECT_ID` — the numeric project ID from the
    CurseForge project page.
-
-Until both exist the workflow **skips rather than fails**, so it will not put a red cross on a
-release. Once they exist, `workflow_dispatch` uploads an already-published tag by hand — which is
-how a release published before the secrets were set gets its jars to CurseForge. That run also takes
-a `release_type` (release / beta / alpha) and an `only` filter, so a subset of the jars can go up at
-a different release type from the rest.
 
 `scripts/curseforge-upload.sh` does the actual upload and runs locally too. CurseForge wants numeric
 game-version IDs and renumbers them as versions are added, so it resolves them from the API every
@@ -559,6 +563,30 @@ the version before anything can be uploaded against it.
 release that is already up gets each file rejected as a duplicate — and rejected files are hidden
 from the author file list by default, so it looks like nothing arrived at all. The authoritative
 view is `authors.curseforge.com/#/projects/<id>/files`.
+
+#### Modrinth
+
+1. Create a personal access token at <https://modrinth.com/settings/pats> with the **Create
+   versions** scope. One token covers every project on the account, so the same secret is what the
+   other ReForged mods use.
+2. Repo **Settings → Secrets and variables → Actions → Secrets**: add `MODRINTH_TOKEN`.
+3. Same screen, **Variables** tab: add `MODRINTH_PROJECT_ID` — the project's ID or slug, from its
+   settings page. Unlike the token this is per-mod, so it cannot be shared.
+
+`scripts/modrinth-upload.sh` does the actual upload and runs locally too. Modrinth takes game
+versions by name rather than by numeric ID, so there is no ID lookup — but it also accepts a *list*
+of them on one file, which CurseForge will not. The workflow uses that: it finds the branch whose
+`minecraft_version` built each jar, reads that branch's `minecraft_version_range`, and expands the
+range against the versions Modrinth lists. The `mc26.1` jar therefore publishes as 26.1, 26.1.1 and
+26.1.2 rather than only the 26.1.2 it was compiled against — the same "declare the line, not the
+build" rule the version ranges themselves follow. Matching is on the version, not a hardcoded branch
+list, so a fourth line publishes correctly the day its branch is pushed. Pass
+`MODRINTH_GAME_VERSIONS` to override the list by hand when running the script locally.
+
+Modrinth has no moderation queue for a new version on an approved project: a 200 means it is live.
+It does require `version_number` to be unique per project, which is why versions are published as
+`2.5.1+mc26.2` — all three branches share a `mod_version`, and the bare number would collide on the
+second upload.
 
 ### Branding
 
