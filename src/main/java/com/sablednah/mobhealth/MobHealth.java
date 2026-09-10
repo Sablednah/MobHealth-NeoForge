@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
 
+import com.sablednah.mobhealth.core.BuildInfo;
 import com.sablednah.mobhealth.neoforge.DisplayManager;
 import com.sablednah.mobhealth.neoforge.MobHealthServerEvents;
 import com.sablednah.mobhealth.network.MobHealthNetwork;
@@ -60,7 +61,10 @@ public class MobHealth {
         // to every online player so enforcement changes apply without a manual /mobhealth reload.
         modEventBus.addListener(this::onConfigReloading);
 
-        LOGGER.info("MobHealth {} initialising", modContainer.getModInfo().getVersion());
+        // Which build, not just which release: a bug report is worth far more when the log
+        // says the commit that produced the bytes that ran. Shared format across this family
+        // of mods -- see BuildInfo.
+        LOGGER.info("MobHealth {}", BuildInfo.describe());
     }
 
     private void onConfigReloading(ModConfigEvent.Reloading event) {
