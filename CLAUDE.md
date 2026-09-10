@@ -38,6 +38,32 @@ All three branches share one `mod_version`, so a jar is identified by
 `mobhealth-<mod_version>+mc<minecraft_version>.jar` — the `+mc` suffix is load-bearing, and both
 publishing scripts parse it.
 
+## Build stamp
+
+Every jar records the commit it was built from, and says so at startup:
+
+```
+MobHealth 2.5.1 (build a1b2c3d4 on main, 2026-09-10T07:45:06Z)
+```
+
+The version answers *which release*; during development that is a different question from *which
+bytes*, and the log line is the half that matters — it says what actually **ran**, which is what a
+bug report needs. Two carriers, two readers: `/mobhealth/build.properties` (read by the running mod,
+namespaced under the mod id so it cannot pick up another mod's copy) and the `Build-Commit` /
+`Build-Branch` / `Build-Time` manifest attributes (for inspecting a jar from a shell without loading
+it — this is what tells you an instance jar is stale).
+
+- **This format is shared with the rest of Sablednah's mods.** Changing it here alone makes one mod
+  the odd one out and breaks the habit of reading them all the same way. Change it everywhere or
+  nowhere.
+- **`time` is the commit's time, not the wall clock** — see the gotchas below before "fixing" it.
+- **The stamp must never be able to break a build or a launch.** It is diagnostic information, not a
+  dependency: the git calls tolerate git being absent (a source zip, a CI checkout without history),
+  and a missing or corrupt stamp degrades to `unknown` rather than throwing. Degrading is
+  *all-or-nothing* on purpose — a half-parsed stamp would report a real-looking commit with the rest
+  unknown, which is worse than none because it looks like an answer.
+- `BuildInfo` lives in `core` and touches no loader API, so a Fabric port inherits it unchanged.
+
 ## Publishing
 
 A published GitHub release fans its attached jars out to **CurseForge and Modrinth** automatically —
@@ -66,6 +92,12 @@ are gated by vanilla operator level rather than by nodes, so LuckPerms cannot gr
 
 - **Never enumerate display modes in prose.** "chat & boss bar" has gone stale twice as modes were
   added. Name the exception instead — the nameplate — and let the rest be implied.
+- **The build stamp's `time` must come from the commit, never `new Date()`.** A wall-clock stamp
+  changes on every Gradle invocation, so `generateModMetadata`'s inputs change every time and
+  `processResources` and `jar` are *never* up to date — measured at roughly 20 seconds added to
+  every no-op build, forever. `git show -s --format=%ct` restores caching outright (a no-op build
+  goes back to `5 up-to-date`). Use `%ct`, not `%cI`: `%cI` carries the committer machine's UTC
+  offset, so one commit would stamp differently on two machines.
 - **`${VAR:?message}` parses quotes even inside double quotes.** An apostrophe in one of those shell
   error messages silently swallows the rest of the script. Write those messages without `'` or `"`.
 - **`Entity.getX(double)`/`getY`/`getZ` are not partial-tick interpolation** — they return a point

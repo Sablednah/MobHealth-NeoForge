@@ -30,6 +30,7 @@ graphical floating bars.
 - [How MobHealth decides what to show](#how-mobhealth-decides-what-to-show)
 - [Minecraft versions](#minecraft-versions)
 - [Building from source](#building-from-source)
+  - [Which build is this?](#which-build-is-this)
   - [Releasing](#releasing)
 - [License](#license)
 
@@ -532,6 +533,33 @@ Run `./gradlew runClient` or `./gradlew runServer` for a dev instance.
 `./deploy.sh` builds and drops the jar into a CurseForge test instance, picking the JDK and the
 instance from the branch's `minecraft_version`. Override the target with
 `MOBHEALTH_INSTANCE="/path/to/instance" ./deploy.sh`.
+
+### Which build is this?
+
+Every jar records the commit it was built from, and MobHealth prints it at startup:
+
+```
+MobHealth 2.5.1 (build a1b2c3d4 on main, 2026-09-10T07:45:06Z)
+```
+
+Search `logs/latest.log` for `MobHealth` to find it.
+
+**If you are reporting a bug, that line is the single most useful thing to include** — a version
+number says which release, but the commit says which bytes actually ran. A `-dirty` suffix means the
+jar was built from uncommitted changes, so it does not correspond to any commit you can look up.
+
+The same values are on the jar's manifest, which answers "is the jar in this instance stale?"
+without launching anything:
+
+```bash
+unzip -p mobhealth-2.5.1+mc1.21.11.jar META-INF/MANIFEST.MF | grep Build-
+# Build-Commit: a1b2c3d4
+# Build-Branch: main
+# Build-Time: 2026-09-10T07:45:06Z
+```
+
+`Build-Time` is the time of the *commit*, not of the build, so rebuilding the same commit twice
+gives an identical stamp.
 
 ### Releasing
 
