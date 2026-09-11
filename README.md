@@ -561,6 +561,15 @@ unzip -p mobhealth-2.5.1+mc1.21.11.jar META-INF/MANIFEST.MF | grep Build-
 `Build-Time` is the time of the *commit*, not of the build, so rebuilding the same commit twice
 gives an identical stamp.
 
+`./deploy.sh` prints both stamps as it swaps the jar — what it is replacing and what with — because
+two jars with the same filename are otherwise indistinguishable, and that is the moment you would
+want to know:
+
+```
+>> Replacing: mobhealth-2.5.1+mc1.21.11.jar [a1b2c3d4 on main, 2026-09-10T07:45:06Z]
+>> With:      mobhealth-2.5.1+mc1.21.11.jar [1f9ad3e5 on main, 2026-09-10T10:34:48Z]
+```
+
 ### Releasing
 
 Publishing a GitHub release publishes to **CurseForge and Modrinth** too, via
