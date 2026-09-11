@@ -73,6 +73,32 @@ instance_locked() {
     exit 1
 }
 
+# Name both builds out loud, at the moment of the swap. Two jars with the same version string
+# are indistinguishable on disk apart from the stamp inside them, and the moment that matters
+# is this one -- deciding "the version already reads 2.5.1, so it must be current" is a
+# judgement no script can stop, but printing what is actually being replaced makes it wrong
+# where you can see it rather than an hour later. A jar older than the stamp says so.
+jar_stamp() {
+    local j="${1:-}" c b t
+    [ -n "$j" ] && [ -f "$j" ] || { echo "absent"; return; }
+    command -v unzip >/dev/null 2>&1 || { echo "unknown - no unzip here"; return; }
+    c="$(unzip -p "$j" META-INF/MANIFEST.MF 2>/dev/null | tr -d '\r' | sed -n 's/^Build-Commit: //p')"
+    [ -n "$c" ] || { echo "none, predates stamps"; return; }
+    b="$(unzip -p "$j" META-INF/MANIFEST.MF 2>/dev/null | tr -d '\r' | sed -n 's/^Build-Branch: //p')"
+    t="$(unzip -p "$j" META-INF/MANIFEST.MF 2>/dev/null | tr -d '\r' | sed -n 's/^Build-Time: //p')"
+    echo "$c on $b, $t"
+}
+
+# A plain glob, not `ls ... | head`: with `set -o pipefail` above, a glob that matches nothing
+# makes ls fail, which fails the assignment, which exits the script -- silently, right after a
+# successful build, on the one run where there is nothing to replace (a first deploy).
+OLD_JAR=""
+for f in "$MODS"/mobhealth-*.jar; do
+    [ -f "$f" ] && { OLD_JAR="$f"; break; }
+done
+echo ">> Replacing: ${OLD_JAR:+$(basename "$OLD_JAR") }[$(jar_stamp "${OLD_JAR:-}")]"
+echo ">> With:      $(basename "$JAR") [$(jar_stamp "$JAR")]"
+
 echo ">> Removing previous MobHealth jars from the instance..."
 rm -f "$MODS"/mobhealth-*.jar || instance_locked "remove"
 
