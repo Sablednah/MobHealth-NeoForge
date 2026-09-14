@@ -1,9 +1,9 @@
 package com.sablednah.mobhealth.network;
 
 import com.sablednah.mobhealth.neoforge.MobHealthPermissions;
+import com.sablednah.mobhealth.neoforge.Net;
 
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
@@ -51,8 +51,11 @@ public final class MobHealthNetwork {
         context.enqueueWork(() -> GraphicalGateState.policy = payload.policy());
     }
 
-    /** Send the player their current graphical-bar policy (gate + server-enforced overrides). */
+    /**
+     * Send the player their current graphical-bar policy (gate + server-enforced overrides). A vanilla
+     * client has no graphical bars to gate, so it is skipped rather than kicked.
+     */
     public static void sync(ServerPlayer player) {
-        PacketDistributor.sendToPlayer(player, new GraphicalGatePayload(MobHealthPermissions.graphicalPolicyFor(player)));
+        Net.sendIfAble(player, new GraphicalGatePayload(MobHealthPermissions.graphicalPolicyFor(player)));
     }
 }
