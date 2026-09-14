@@ -30,7 +30,6 @@ import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
@@ -201,7 +200,7 @@ public final class DisplayManager {
         DamageIndicatorPayload payload = new DamageIndicatorPayload(
                 victim.getX(), victim.getY() + victim.getBbHeight() * 0.6D, victim.getZ(), damage, fatal);
         for (ServerPlayer viewer : viewers) {
-            PacketDistributor.sendToPlayer(viewer, payload);
+            Net.sendIfAble(viewer, payload); // vanilla viewers still get the text modes
         }
     }
 
@@ -212,7 +211,7 @@ public final class DisplayManager {
         String name = cleanName(victim).getString();
         ItemStack icon = damageIcon(source, attacker);
         for (ServerPlayer viewer : viewers) {
-            PacketDistributor.sendToPlayer(viewer, new ToastPayload(name, damage, (float) current, (float) max, icon));
+            Net.sendIfAble(viewer, new ToastPayload(name, damage, (float) current, (float) max, icon));
         }
     }
 
