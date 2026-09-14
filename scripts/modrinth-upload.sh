@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Upload one built jar to the Modrinth project.
 #
-#   MODRINTH_TOKEN=xxx MODRINTH_PROJECT_ID=abcd1234 \
+#   MODRINTH_TOKEN=xxx MODRINTH_PROJECT_ID=abcd1234|slug \
 #     ./scripts/modrinth-upload.sh <jar> <minecraft-version> <changelog-file> [release-type]
 #
 # Normally run for you by .github/workflows/modrinth.yml when a GitHub release is published, so
@@ -32,7 +32,7 @@ RELEASE_TYPE="${4:-release}"
 # No apostrophes or quote characters in these messages: bash parses quoting inside ${var:?word}
 # even within double quotes, so a stray one silently swallows the rest of the script.
 : "${MODRINTH_TOKEN:?set MODRINTH_TOKEN — create one at https://modrinth.com/settings/pats with the Create versions scope}"
-: "${MODRINTH_PROJECT_ID:?set MODRINTH_PROJECT_ID — the project ID or slug, from its settings page}"
+: "${MODRINTH_PROJECT_ID:?set MODRINTH_PROJECT_ID — the project slug or its 8-character base62 ID}"
 
 [ -f "$JAR" ] || { echo "!! No such jar: $JAR" >&2; exit 1; }
 [ -f "$CHANGELOG_FILE" ] || { echo "!! No such changelog: $CHANGELOG_FILE" >&2; exit 1; }
@@ -40,6 +40,29 @@ RELEASE_TYPE="${4:-release}"
 # Modrinth asks for a User-Agent that identifies the caller, and rate-limits anonymous-looking ones
 # harder. https://docs.modrinth.com/api/#user-agents
 UA="Sablednah/MobHealth-NeoForge (github.com/Sablednah/MobHealth-NeoForge)"
+
+# --- project ------------------------------------------------------------------------------------
+
+# The version-create call takes project_id as the base62 ID ONLY. A slug there is rejected with
+# "Invalid character '-' in base62 encoding", which is how 2.5.2's first upload failed. Resolve a
+# slug here so the variable can stay the readable name. The lookup is authenticated because a
+# project still in review (or unlisted) is a 404 to anonymous callers.
+if [[ "$MODRINTH_PROJECT_ID" =~ ^[0-9A-Za-z]{8}$ ]]; then
+    PROJECT_ID="$MODRINTH_PROJECT_ID"
+else
+    echo ">> Resolving Modrinth project $MODRINTH_PROJECT_ID to its ID"
+    LOOKUP="$(curl -sS --max-time 120 -w '\n%{http_code}' \
+        -H "Authorization: $MODRINTH_TOKEN" -H "User-Agent: $UA" \
+        "$API/project/$MODRINTH_PROJECT_ID")"
+    PROJECT_ID="$(sed '$d' <<<"$LOOKUP" | jq -r '.id // empty' 2>/dev/null || true)"
+    if [ "$(tail -n1 <<<"$LOOKUP")" != "200" ] || [ -z "$PROJECT_ID" ]; then
+        echo "!! Could not resolve $MODRINTH_PROJECT_ID (HTTP $(tail -n1 <<<"$LOOKUP"))." >&2
+        echo "!! The token may lack the Read projects scope. Set MODRINTH_PROJECT_ID to the 8-character" >&2
+        echo "!! project ID from the project settings page instead of the slug." >&2
+        exit 1
+    fi
+    echo "   Project ID: $PROJECT_ID"
+fi
 
 # --- game versions ------------------------------------------------------------------------------
 
@@ -139,7 +162,7 @@ METADATA="$(jq -n \
     --arg name "$DISPLAY_NAME" \
     --arg versionNumber "$VERSION_NUMBER" \
     --arg versionType "$RELEASE_TYPE" \
-    --arg projectId "$MODRINTH_PROJECT_ID" \
+    --arg projectId "$PROJECT_ID" \
     --argjson gameVersions "$(printf '%s\n' "${GAME_VERSIONS[@]}" | jq -R . | jq -sc .)" \
     '{name: $name, version_number: $versionNumber, changelog: $changelog,
       dependencies: [], game_versions: $gameVersions, version_type: $versionType,

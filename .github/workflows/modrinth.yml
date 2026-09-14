@@ -9,8 +9,9 @@ name: Publish to Modrinth
 #      "Create versions" scope
 #   2. Add it as the repository secret MODRINTH_TOKEN
 #      (Settings -> Secrets and variables -> Actions -> New repository secret)
-#   3. Add the project's ID or slug, shown on the project page, as the repository
-#      variable MODRINTH_PROJECT_ID (same screen, "Variables" tab)
+#   3. Add the project's slug (or its 8-character base62 ID) as the repository variable
+#      MODRINTH_PROJECT_ID (same screen, "Variables" tab). The upload script resolves a slug to
+#      the ID itself, since Modrinth's create-version call accepts only the ID.
 #
 # Until the secret exists this workflow skips rather than fails, so it will not redden the release.
 
