@@ -2,7 +2,7 @@
 
 **This simple but invaluable mod lets you know the damage you just caused to a mob (including other players), and how much health it has left.**
 
-MobHealth is a modern NeoForge rewrite of the classic MobHealth Bukkit plugin — the same idea it had in 2011, rebuilt for Minecraft 1.21.11, 26.1 and 26.2 with seven display modes you can mix and match.
+MobHealth is a modern NeoForge rewrite of the classic MobHealth Bukkit plugin — the same idea it had in 2011, rebuilt for Minecraft 1.21.11, 26.1, 26.2 and 26.3 with seven display modes you can mix and match.
 
 Hit a zombie, and MobHealth tells you exactly what you did to it:
 
@@ -148,6 +148,7 @@ Pick the file matching your Minecraft version — each jar's name carries it.
 | 1.21.11 | 21.11.42+ | 21 | `mobhealth-<version>+mc1.21.11.jar` |
 | 26.1.2 | 26.1.2.95+ | 25 | `mobhealth-<version>+mc26.1.2.jar` |
 | 26.2 | 26.2.0.59+ | 25 | `mobhealth-<version>+mc26.2.jar` |
+| 26.3 | 26.3.0.33+ | 25 | `mobhealth-<version>+mc26.3.jar` |
 
 The Java version tracks Minecraft, not MobHealth — 26.1 ships its own Java 25 runtime, so the
 launcher handles it for you.

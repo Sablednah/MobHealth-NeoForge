@@ -498,7 +498,7 @@ on top — which is why they work on a vanilla server and damage indicators do n
 
 ## Minecraft versions
 
-MobHealth is built for three Minecraft lines, one per branch. All three carry the same mod version
+MobHealth is built for four Minecraft lines, one per branch. All four carry the same mod version
 and the same features; only the branch differs.
 
 | Branch | Minecraft | NeoForge | Java | Jar |
@@ -506,10 +506,11 @@ and the same features; only the branch differs.
 | `main` | 1.21.11 | 21.11.42 | 21 | `mobhealth-<version>+mc1.21.11.jar` |
 | `mc26.1` | 26.1.2 | 26.1.2.95 | 25 | `mobhealth-<version>+mc26.1.2.jar` |
 | `mc26.2` | 26.2 | 26.2.0.59 | 25 | `mobhealth-<version>+mc26.2.jar` |
+| `mc26.3` | 26.3 | 26.3.0.33-beta | 25 | `mobhealth-<version>+mc26.3.jar` |
 
-Every jar carries the Minecraft version it was built against, because three files all called
+Every jar carries the Minecraft version it was built against, because four files all called
 `mobhealth-<version>.jar` are indistinguishable in a mods folder. The version *inside* the jar's
-`neoforge.mods.toml` is a plain `<version>` on all three.
+`neoforge.mods.toml` is a plain `<version>` on all four.
 
 Minecraft is on quarterly calendar versioning now, so this is a treadmill rather than a port that
 finishes. What each drop actually cost, and why the answer changes the plan, is written down in
@@ -576,7 +577,7 @@ Publishing a GitHub release publishes to **CurseForge** too, via
 [`.github/workflows/curseforge.yml`](.github/workflows/curseforge.yml). It downloads every jar
 attached to the release, reads the Minecraft version out of each filename
 (`mobhealth-2.5.1+mc26.2.jar` → `26.2`), and uploads them with the release body as the changelog. So
-one release carries all three lines to CurseForge, provided all three jars are attached to it.
+one release carries every line to CurseForge, provided every line's jar is attached to it.
 
 The workflow **skips rather than fails** until its secret is set, so it never puts a red cross on a
 release. Once set, `workflow_dispatch` uploads an already-published tag by hand — which is how a release
@@ -613,7 +614,7 @@ view is `authors.curseforge.com/#/projects/<id>/files`.
 | `docs/banner.png` | The original 320×64 banner. Superseded here, but still what the version branches' READMEs point at — documentation lives on `main`, so they were not re-pointed at an image they do not carry. |
 | `docs/reforged.png` | The bare ReForged plate, 1024². A source element rather than a mod icon: it carries no MobHealth identity of its own, so nothing ships it. |
 
-`neoforge.mods.toml` declares `iconFile`, `bannerFile` and `logoFile`. 26.2 uses the first two — a
+`neoforge.mods.toml` declares `iconFile`, `bannerFile` and `logoFile`. 26.2 and later use the first two — a
 small square beside the name in the list, and a wide image in the info panel — and older loaders
 ignore both and read the third.
 

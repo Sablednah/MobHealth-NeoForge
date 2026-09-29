@@ -2,7 +2,7 @@
 
 Every permission MobHealth defines, what it gates, and what it does **not** gate.
 
-Accurate as of **MobHealth 2.5.1**. Identical on all three lines — 1.21.11, 26.1 and 26.2 register
+Accurate as of **MobHealth 2.5.1**. Identical on every line — 1.21.11, 26.1, 26.2 and 26.3 register
 the same nodes, so nothing here is version-specific.
 
 MobHealth uses NeoForge's `PermissionAPI`. With no permissions manager installed, each node falls

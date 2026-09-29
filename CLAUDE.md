@@ -3,20 +3,21 @@
 Working notes for this repo. Read `README.md` for what the mod does and `docs/VERSIONS.md` for the
 multi-version porting record — this file is only the conventions those two do not state.
 
-## Three branches, one mod
+## Four branches, one mod
 
 | Branch | Minecraft | NeoForge | JDK |
 |---|---|---|---|
 | `main` | 1.21.11 | 21.11.42 | 21 |
 | `mc26.1` | 26.1.2 | 26.1.2.95 | **25** |
 | `mc26.2` | 26.2 | 26.2.0.59 | **25** |
+| `mc26.3` | 26.3 | 26.3.0.33-beta | **25** |
 
 - **Features land on `main` and cherry-pick forward** (`git cherry-pick -x`). Never develop on a
   version branch.
 - **Documentation lives on `main` only.** `README.md`, `docs/` and this file are not carried
   forward, so do not "fix" their absence on `mc26.*`.
-- **Code that ships must go to all three.** A change to a user-visible string or behaviour is only
-  half-done on `main` — check whether `mc26.1` and `mc26.2` carry the same lines before calling it
+- **Code that ships must go to all four.** A change to a user-visible string or behaviour is only
+  half-done on `main` — check whether every `mc26.*` branch carries the same lines before calling it
   finished.
 - Compile each branch with **its own JDK** before pushing: `JAVA_HOME=$PWD/tools/jdk21` on `main`,
   `tools/jdk25` on the 26.x branches. `tools/` is gitignored, so a fresh clone has to repopulate it.
@@ -34,7 +35,7 @@ minecraft_version_range=[26.1,26.2)   # the line the jar actually runs on
 ```
 
 Keep that distinction. A range pinned to the build strands users on an earlier patch for no reason.
-All three branches share one `mod_version`, so a jar is identified by
+All four branches share one `mod_version`, so a jar is identified by
 `mobhealth-<mod_version>+mc<minecraft_version>.jar` — the `+mc` suffix is load-bearing, and both
 publishing scripts parse it.
 
@@ -71,7 +72,7 @@ A published GitHub release fans its attached jars out to **CurseForge** automati
 because GitHub runs release workflows from the default branch. (Modrinth publishing was removed after
 Modrinth rejected Sablednah's projects — do not add it back.)
 
-- Attach **all three jars** to the release or a line goes unpublished.
+- Attach **all four jars** to the release or a line goes unpublished.
 - The workflow skips rather than fails when unconfigured, and takes a `workflow_dispatch` for
   re-uploading an existing tag.
 - Secrets and variables are already set on the repo. **Never handle the tokens** — not to read them,

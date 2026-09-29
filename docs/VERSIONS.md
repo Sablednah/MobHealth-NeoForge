@@ -1,12 +1,12 @@
 # Building MobHealth for more than one Minecraft version
 
-Minecraft moved to calendar versioning with quarterly drops. Supporting 1.21.11, 26.1 and 26.2 is
+Minecraft moved to calendar versioning with quarterly drops. Supporting 1.21.11, 26.1, 26.2 and 26.3 is
 therefore not a port to be finished — it is a treadmill to be made cheap. This is what each drop
-actually cost, measured rather than predicted, and what those numbers say about how to carry three
+actually cost, measured rather than predicted, and what those numbers say about how to carry four
 lines from here.
 
-**Status: 26.1 and 26.2 both ported, built and jarred (2026-08-26). Neither has been run in a
-client.** A green compile is not a working mod, and the gap between them is where the interesting
+**Status: 26.1 and 26.2 ported, built and jarred (2026-08-26); 26.3 ported 2026-09-29 and started
+on a dev server. None of the 26.x lines has been run in a client.** A green compile is not a working mod, and the gap between them is where the interesting
 failures live — see "What is still unverified".
 
 ## The targets
@@ -16,6 +16,7 @@ failures live — see "What is still unverified".
 | `main` | 1.21.11 | 21.11.42 | 21 | 2.0.141 |
 | `mc26.1` | 26.1.2 | 26.1.2.95 | **25** | 2.0.141 |
 | `mc26.2` | 26.2 | 26.2.0.59 | **25** | 2.0.144 |
+| `mc26.3` | 26.3 | 26.3.0.33-beta | **25** | 2.0.147 |
 
 The Java bump is not optional: 26.1 ships the `java-runtime-epsilon` JRE to players, so a mod
 targeting 21 is targeting a runtime nobody has.
@@ -25,13 +26,13 @@ targeting 21 is targeting a runtime nobody has.
 Branch, set the versions and toolchain, `compileJava`, fix, repeat. Each branch is cut from the one
 before it, so `mc26.2`'s number is the 26.1 → 26.2 delta and not the 1.21.11 → 26.2 one.
 
-| | 26.1 | 26.2 |
-|---|---|---|
-| errors | **25** | **5** |
-| files touched | 4 | 3 |
-| distinct API changes | 8 (2 of them silent) | 3 |
-| errors in `client/` | 18, in 3 files | 5, in 3 files |
-| errors server-side | 7, all in `DisplayManager` | 0 |
+| | 26.1 | 26.2 | 26.3 |
+|---|---|---|---|
+| errors | **25** | **5** | **0** |
+| files touched | 4 | 3 | 0 |
+| distinct API changes | 8 (2 of them silent) | 3 | 0 |
+| errors in `client/` | 18, in 3 files | 5, in 3 files | 0 |
+| errors server-side | 7, all in `DisplayManager` | 0 | 0 |
 
 **26.2 was five times cheaper than 26.1**, which is the opposite of what the sibling repos led us to
 expect: CityWorld's 26.2 cost a block-declaration model rewrite and LegendQuest's was 53 errors
@@ -88,6 +89,31 @@ All three are one change seen from three sides: 26.2 gathered what used to hang 
 `Minecraft.setScreen` moved the same way — which cost LegendQuest five call sites and cost us none,
 because this mod opens no screens of its own.
 
+### 26.3: nothing, and checked rather than assumed
+
+The whole port was `gradle.properties` (versions and both ranges moved to the 26.3 line) and
+ModDevGradle 2.0.144 → 2.0.147. It compiled first time.
+
+A clean compile only says the names still exist, and the sibling repos showed why that is not
+enough: 26.3 replaced GLFW with SDL, which renumbers the mouse buttons, and Standards and Factions
+compiled clean while every click in their panels stopped working. So every `net.minecraft` class
+this mod imports was diffed between the 26.2.0.59 and 26.3.0.33 decompiled sources
+(`build/moddev/artifacts/minecraft-patched-*-sources.jar`):
+
+- `Toast`, `ToastManager`, `BossEvent`, `ServerBossEvent`, `CustomPacketPayload`,
+  `RegistryFriendlyByteBuf` and `Component` are **byte-identical**.
+- In the classes that did change (`Entity`, `LivingEntity`, `Minecraft`, `GuiGraphicsExtractor`,
+  `RenderPipelines`, …) **no method this mod calls changed its signature**.
+- `Camera`'s projection path, the top risk in "What is still unverified", is untouched. Its only
+  change is `extractRenderState` taking a `DeltaTracker`, which the mod does not call.
+- The SDL renumbering cannot reach this mod, because **it handles no input at all**: no screens, no
+  key mappings, no click handlers.
+- Blaze3d's pipeline and texture classes moved to `com.mojang.renderpearl.api`. The mod imports
+  neither package.
+
+A 26.3 dev server starts clean and logs the build stamp. The client is as unverified as on the other
+26.x lines.
+
 ## Why 26.2 was cheap here
 
 The two changes that made 26.2 expensive across the other repos miss this mod completely, and not by
@@ -125,7 +151,8 @@ That is the same split LegendQuest measured (25 of 36, then 37 of 53) and it poi
 are ever merged into one tree.
 
 **Not doing that yet, on the same reasoning as the siblings.** Two drops is two. Branch-per-version
-costs nothing to keep until 26.3 (~Sept 2026) tests whether the client stays the whole story, and
+costs nothing to keep until 26.3 (~Sept 2026) tests whether the client stays the whole story (it
+did not get the chance: 26.3 cost nothing on either side), and
 merging three branches is cheap now and cheap later; guessing wrong about the mechanism is not.
 
 One thing does argue more strongly here than in LegendQuest, though: our client divergence is
@@ -136,8 +163,9 @@ just not yet worth building.
 
 ## What is still unverified
 
-Everything below the compiler. Both 26.x branches produce a jar; neither has been loaded by a game.
-The failures that would not show up in a build, roughly in order of how likely they are to bite:
+Everything below the compiler. Every 26.x branch produces a jar; none has been loaded by a game
+client. The failures that would not show up in a build, roughly in order of how likely they are to
+bite:
 
 1. **The floating bars and damage numbers projecting to the wrong place.**
    `Camera.getViewRotationProjectionMatrix` is a *different route to the matrix*, not a rename, and a
