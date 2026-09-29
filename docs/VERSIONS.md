@@ -175,5 +175,3 @@ The failures that would not show up in a build, roughly in order of how likely t
 - **CI.** No matrix builds the three branches, so a version can rot silently between drops.
   CityWorld's `selftest.yml` is the model; cache keyed on the NeoForge version, because a cold run
   has to let NeoForm decompile Minecraft.
-- **Release plumbing.** Nothing uploads per-version jars to CurseForge or Modrinth with the right
-  game versions declared. The jar names already carry the version a workflow would parse.

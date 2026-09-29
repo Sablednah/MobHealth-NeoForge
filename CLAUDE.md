@@ -66,20 +66,18 @@ it — this is what tells you an instance jar is stale).
 
 ## Publishing
 
-A published GitHub release fans its attached jars out to **CurseForge and Modrinth** automatically —
-`.github/workflows/curseforge.yml` and `modrinth.yml`, each calling its `scripts/*-upload.sh`. Both
-live on `main` only, because GitHub runs release workflows from the default branch.
+A published GitHub release fans its attached jars out to **CurseForge** automatically —
+`.github/workflows/curseforge.yml`, calling `scripts/curseforge-upload.sh`. It lives on `main` only,
+because GitHub runs release workflows from the default branch. (Modrinth publishing was removed after
+Modrinth rejected Sablednah's projects — do not add it back.)
 
 - Attach **all three jars** to the release or a line goes unpublished.
-- Both workflows skip rather than fail when unconfigured, and both take a `workflow_dispatch` for
+- The workflow skips rather than fails when unconfigured, and takes a `workflow_dispatch` for
   re-uploading an existing tag.
 - Secrets and variables are already set on the repo. **Never handle the tokens** — not to read them,
   echo them, or write them to a file.
-- `docs/curseforge-description.md` is the source for both store pages, but the pages themselves are
+- `docs/curseforge-description.md` is the source for the store page, but the page itself is
   **pasted in by hand**. Editing that file changes nothing until someone uploads it.
-- Store rules differ: Modrinth requires alt text on every image (a stated rejection cause) and
-  renders HTML through the js-xss default whitelist, which does pass `table`/`td` with
-  `align`/`width` and `img` with `src`/`alt`/`width`.
 
 ## Permissions
 
