@@ -10,7 +10,7 @@ multi-version porting record — this file is only the conventions those two do 
 | `main` | 1.21.11 | 21.11.42 | 21 |
 | `mc26.1` | 26.1.2 | 26.1.2.95 | **25** |
 | `mc26.2` | 26.2 | 26.2.0.59 | **25** |
-| `mc26.3` | 26.3 | 26.3.0.33-beta | **25** |
+| `mc26.3` | 26.3 | 26.3.0.58-beta | **25** |
 
 - **Features land on `main` and cherry-pick forward** (`git cherry-pick -x`). Never develop on a
   version branch.

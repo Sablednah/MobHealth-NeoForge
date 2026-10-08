@@ -16,7 +16,7 @@ failures live — see "What is still unverified".
 | `main` | 1.21.11 | 21.11.42 | 21 | 2.0.141 |
 | `mc26.1` | 26.1.2 | 26.1.2.95 | **25** | 2.0.141 |
 | `mc26.2` | 26.2 | 26.2.0.59 | **25** | 2.0.144 |
-| `mc26.3` | 26.3 | 26.3.0.33-beta | **25** | 2.0.147 |
+| `mc26.3` | 26.3 | 26.3.0.58-beta | **25** | 2.0.147 |
 
 The Java bump is not optional: 26.1 ships the `java-runtime-epsilon` JRE to players, so a mod
 targeting 21 is targeting a runtime nobody has.
@@ -113,6 +113,17 @@ this mod imports was diffed between the 26.2.0.59 and 26.3.0.33 decompiled sourc
 
 A 26.3 dev server starts clean and logs the build stamp. The client is as unverified as on the other
 26.x lines.
+
+### 26.3.0.58: one rename, and the file it would have renamed
+
+FML 12.0.8 (NeoForge 26.3.0.37-beta and later) renamed `ModConfig.Type.COMMON` to `LOCAL` (and
+`SERVER` to `SYNCED`). The mod had been capped below .37 so the `NoSuchFieldError` became a "needs
+an older version" message; the port (2026-10-08) is the rename and a floor of `[26.3.0.58-beta,)`.
+
+The part the compiler never mentions: **`LOCAL` names the file `<modid>-local.toml`**, so an
+existing server would silently start from defaults. `registerConfig` still takes a file name, so
+the old `mobhealth-common.toml` is passed explicitly and nothing migrates. The LegendQuest session
+found it; Standards and Factions confirmed it; a .58 dev server here writes the old name.
 
 ## Why 26.2 was cheap here
 
