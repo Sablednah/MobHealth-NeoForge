@@ -46,7 +46,10 @@ public class MobHealth {
 
     public MobHealth(IEventBus modEventBus, ModContainer modContainer) {
         // Register the server-side (common) configuration.
-        modContainer.registerConfig(ModConfig.Type.COMMON, MobHealthConfig.SPEC);
+        // LOCAL is what FML 12.0.8 (NeoForge 26.3.0.37+) calls COMMON. The file name is given
+        // explicitly: LOCAL would otherwise name it mobhealth-local.toml, and every existing server
+        // would silently start from defaults. (Tip from the LegendQuest session.)
+        modContainer.registerConfig(ModConfig.Type.LOCAL, MobHealthConfig.SPEC, "mobhealth-common.toml");
 
         // Register the server-side display driver on the game event bus (damage + tick).
         NeoForge.EVENT_BUS.register(new DisplayManager());
