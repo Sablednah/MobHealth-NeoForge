@@ -1,3 +1,4 @@
+![MobHealth](https://media.forgecdn.net/attachments/description/1608871/description_db3b38ec-cd76-4432-9401-b53ee8a38fb9.png)
 # MobHealth
 
 **This simple but invaluable mod lets you know the damage you just caused to a mob (including other players), and how much health it has left.**
